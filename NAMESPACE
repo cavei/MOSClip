@@ -1,0 +1,8 @@
+importFrom("methods", "new")
+importFrom("stats", "as.formula", "cutree", "dist", "hclust", "sd")
+importFrom("survClip", "survivalcox", "makePositiveDefinite",
+       "computePCs", "compPCs", "topoCompPCs", "sparseCompPCs")
+importFrom("grid", "viewport")
+import(graph, qpgraph, grid)
+
+exportPattern("^[[:alpha:]]+")
