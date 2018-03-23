@@ -40,6 +40,7 @@ plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ 
                          fileName=NULL, paletteName=c("r_RdYlBu", "BuGn","Blues"),
                          h = 9, w=7) {
   require(survminer)
+  require(survival)
 
   # moduleGenes <- pathway@modules[[moduleNumber]]
   involved <- guessInvolvement(pathway, moduleNumber = moduleNumber)

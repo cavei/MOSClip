@@ -39,7 +39,7 @@ plotPathwayKM <- function(pathway, formula = "Surv(days, status) ~ PC1",
                           fileName=NULL, paletteName=c("r_RdYlBu", "BuGn","Blues"),
                           h = 9, w=7) {
 
-  checkmate::assertClass(pathway, "MultiOmicsModules")
+  checkmate::assertClass(pathway, "MultiOmicsPathway")
   require(survminer)
 
   involved <- guessInvolvementPathway(pathway)

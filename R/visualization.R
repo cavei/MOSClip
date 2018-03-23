@@ -17,16 +17,11 @@ formatModuleReport <- function(smObj){
   cbind(row.names=idxs, pvalue=alphas[idxs], data.frame(colDescription))
 }
 
-multiPathwayReport <- function(multiPathway, p.adjust.method = p.adjust.methods){
+multiPathwayReport <- function(multiPathway){
   if (!is(multiPathway,"list"))
     stop("A list of pathway results are expected.")
 
-  if (all(p.adjust.method==p.adjust.methods)) {
-    p.adjust.method = "BH"
-  }
-
   pvalues <- sapply(multiPathway, function(p) {as.numeric(p@pvalue)})
-  p.adj <- p.adjust(pvalues, method=p.adjust.method)
 
   zs <- sort(unique(unlist(lapply(multiPathway, function(p) {
     names(p@zlist)
@@ -40,7 +35,7 @@ multiPathwayReport <- function(multiPathway, p.adjust.method = p.adjust.methods)
   }))
 
   ord <- order(pvalues)
-  cbind(row.names=names(pvalues)[ord], pvalue=pvalues[ord], p.adj=p.adj[ord], data.frame(zMat[ord, , drop=F]))
+  cbind(row.names=names(pvalues)[ord], pvalue=pvalues[ord], data.frame(zMat[ord, , drop=F]))
 }
 
 multiPathwayModuleReport <- function(multiPathwayModuleList, top=25) {
