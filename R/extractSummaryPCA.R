@@ -33,8 +33,8 @@ extractHighLoadingsGenes <- function(loadings, thr, atleast=1) {
 }
 
 collapse <- function(list) {
-  df <- data.frame(genes=sapply(list, function(x) row.names(x)),
-                   components=sapply(list, function(x) x$component), stringsAsFactors = F)
+  df <- data.frame(genes=unlist(lapply(list, function(x) row.names(x))),
+                   components=unlist(lapply(list, function(x) x$component)), stringsAsFactors = F)
   tapply(seq_len(NROW(df)), df$genes, function(idx){
     paste(df$components[idx], collapse=";")
   }, simplify = F)
