@@ -4,7 +4,8 @@ availableOmicsMethods <- function() {
            "summarizeModulesWithPca"))
 }
 
-summarizeModulesToBinaryEvents <- function(data, cliqueGenes, name="cov", binaryClassMin=10, cliques=NULL) {
+summarizeModulesToBinaryEvents <- function(data, cliqueGenes, name="cov",
+                                           binaryClassMin=10, cliques=NULL) {
   if (is.null(data))
     return(NULL)
 
@@ -23,16 +24,15 @@ summarizeModulesToBinaryEvents <- function(data, cliqueGenes, name="cov", binary
 
   collapsed <- data.frame(collapsed, row.names = names(collapsed), stringsAsFactors = F)
   colnames(collapsed) <- name
-  list(x=collapsed, dataModule=t(dataClique), namesCov=name,method="binary")
+  list(x=collapsed, dataModule=t(dataClique), namesCov=name, method="binary")
 }
 
 summarizeModulesInCluster <- function(data, cliqueGenes, name="clust", cliques=NULL) {
-  datamat <- data$met
+  datamat <- data$met ## modificare in modo che se non c'è un dizionario usi i geni stessi
   dict <- data$dict
 
   if (is.null(datamat))
     return(NULL)
-
   genes <- intersect(names(dict), cliqueGenes)
 
   if (length(genes)==0)
@@ -46,13 +46,12 @@ summarizeModulesInCluster <- function(data, cliqueGenes, name="clust", cliques=N
     return(NULL)
 
   hc <- hclust(dist(datamatClique, method = "euclidean"), method="ward.D2")
-  # clusters <- kmeans(datamatClique, centers=2)
+  # clusters <- kmeans(datamatClique, centers=2) # provioamo a implementare anche il Kmeans?
 
   if (ncol(datamatClique)<4){
     covs <- data.frame(factor(cutree(hc, k = 2)), stringsAsFactors = T)
     names(covs) <- paste0(name,"_2k")
   } else {
-    # max <- min(ceiling(NCOL(datamatClique)*0.6), 5) ## To set variable number of classes
     covs <- data.frame(factor(cutree(hc, k = 3)), stringsAsFactors = T)
     names(covs) <- paste0(name,"_3k")
   }
@@ -73,22 +72,14 @@ summarizeModulesWithPca <- function(data, cliqueGenes, name="exprs", shrink=FALS
     return(NULL)
 
   if (NCOL(dataClique)!=1) {
-    pcs <- survClip:::computePCs(dataClique, shrink=shrink, method=method, cliques=cliques, maxPCs=maxPCs)
+    pcs <- computePCs(dataClique, shrink=shrink, method=method, cliques=cliques, maxPCs=maxPCs)
   } else {
     colnames(dataClique) <- "PC1"
     pcs <- list(x=dataClique, sdev=sd(dataClique), loadings=1)
   }
 
-  # topLoad <- apply(pcs$loadings, 2, function(col) {
-  #   aboveThr <- names(which(abs(col) >= loadThr))
-  #   if (length(aboveThr) == 0)
-  #     aboveThr <- head(col[order(abs(col), decreasing = T)], 2)
-  #   aboveThr
-  # })
-
   pcs$dataModule <- t(dataClique)
-  pcs$method="pca"
+  pcs$method=paste("pca", method)
   pcs$namesCov=colnames(pcs$x)
-  # pcs$topLoad <- topLoad
   pcs
 }

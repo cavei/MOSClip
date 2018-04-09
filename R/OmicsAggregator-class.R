@@ -1,6 +1,6 @@
 check_Omics <- function(object) {
   if (length(object@data) != length(object@methods)){
-    msg <- "data and relative methods to analyze them must be equal in length."
+    msg <- "Data and relative methods to analyze them must be equal in length."
     return(msg)
   }
 

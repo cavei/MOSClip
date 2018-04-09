@@ -1,8 +1,12 @@
-importFrom("methods", "new")
-importFrom("stats", "as.formula", "cutree", "dist", "hclust", "sd")
-importFrom("survClip", "survivalcox", "makePositiveDefinite",
-       "computePCs", "compPCs", "topoCompPCs", "sparseCompPCs")
+importFrom("methods", "new", "is")
+importFrom("stats", "as.formula", "cutree", "dist", "hclust", "sd", "kruskal.test","reorder")
+importFrom("survClip", "survivalcox")
+importFrom("houseOfClipUtiliy", "makePositiveDefinite", "computePCs", "compPCs", "topoCompPCs", "sparseCompPCs")
 importFrom("grid", "viewport")
-import(graph, qpgraph, grid)
+importFrom("grDevices", "colorRampPalette", "dev.off", "pdf")
+importFrom("pheatmap", "pheatmap")
+importFrom("graphics", "legend")
+importFrom("utils", "head", "read.table")
+import(graph)
 
 exportPattern("^[[:alpha:]]+")
