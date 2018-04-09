@@ -1,7 +1,7 @@
 getPathFathers<- function(p, df.g, ord=3, plot=F) {
-  if (is.null(roots)) {
-    roots=names(V(df.g))
-  }
+  # if (is.null(roots)) {
+  #   roots=names(V(df.g))
+  # }
   require(igraph)
   if (!(p %in% names(V(df.g)))){
     warning(paste0("Id ", p, " is not in the hierarchy."))

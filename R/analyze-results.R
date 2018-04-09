@@ -1,8 +1,6 @@
 anlayze <- function() {
   # old wpath <- read.table(file="table-whole-pathways-pvalues.txt",sep="\t",header=T)
   module <- moduleSummary # old module
-  wpath <- data.frame(sp, stringsAsFactors = F)
-
   module.sig<-module[module$pvalue<0.05,]
 
   met<-apply(module.sig[,c(4,5,6)],1 , function(x) {
@@ -151,6 +149,14 @@ anlayze <- function() {
     theme_bw()
 
   ############### mappo le categorie sui risultati dei pathway
+  wpath <- data.frame(sp, stringsAsFactors = F)
+  pathHierarchy <- read.table("ReactomePathwaysRelation-HSA.txt", stringsAsFactors = F)
+  df.g <- graph.data.frame(d = pathHierarchy, directed = TRUE)
+
+  pathway2id <- mapReactomeIDfromGraphite(reactome) # codici
+  pathwayDict <- pathway2id$pname
+  names(pathwayDict) <- pathway2id$id
+
   wholePath2id <- mapReactomeIDfromGraphite(reactome, wpath$row.names)
   wfathers <- lapply(wholePath2id$id, getPathFathers, df.g, ord=length(wholePath2id$id)+1)
   names(wfathers) <- wholePath2id$id
@@ -164,6 +170,10 @@ anlayze <- function() {
   # names(tmp)<-names(table(unlist(wpathway2father)))
   tmp<-data.frame(tmp, stringsAsFactors = F)
   tmp<-tmp[tmp$Freq>1,]
+
+  df.multi <- df[grep("&", df$inter), , drop=F]
+  df.single <- df[-grep("&",df$inter),]
+
 
   ggplot(tmp) +
     geom_bar(aes(x = Var1, y = Freq),
