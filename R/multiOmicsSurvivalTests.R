@@ -52,7 +52,7 @@ multiOmicsSurvivalPathwayTest <- function(omicsObj, graph, daysStatus,
   if (autoCompleteFormula)
     formula = paste0(survFormula, paste(colnames(covariates), collapse="+"))
 
-  scox <- suppressWarnings(survClip:::survivalcox(coxObj, formula)) ### Check warnings
+  scox <- suppressWarnings(survClip::survivalcox(coxObj, formula)) ### Check warnings
   # scox$moView <- moduleView
   # scox$formula <- formula
   # scox$moduleData <- moduleData

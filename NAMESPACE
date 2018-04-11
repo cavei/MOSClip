@@ -1,12 +1,28 @@
+importFrom("houseOfClipUtility",
+           "makePositiveDefinite",
+           "computePCs", "compPCs", "topoCompPCs", "sparseCompPCs",
+           "computeSupertestFrequences", "runSupertest",
+           "getPathFathers",
+           "mapPathwaysIDfromGraphite")
+
 importFrom("methods", "new", "is")
 importFrom("stats", "as.formula", "cutree", "dist", "hclust", "sd", "kruskal.test","reorder")
 importFrom("survClip", "survivalcox")
-importFrom("houseOfClipUtiliy", "makePositiveDefinite", "computePCs", "compPCs", "topoCompPCs", "sparseCompPCs")
 importFrom("grid", "viewport")
 importFrom("grDevices", "colorRampPalette", "dev.off", "pdf")
 importFrom("pheatmap", "pheatmap")
 importFrom("graphics", "legend")
 importFrom("utils", "head", "read.table")
-import(graph)
+importFrom("igraph","igraph.from.graphNEL", "simplify", "V")
+importFrom("gridExtra", "arrangeGrob")
+importFrom("grid", "textGrob")
+importFrom("checkmate", "assertClass")
+importFrom("RColorBrewer", "brewer.pal")
+importFrom("grDevices", "colorRampPalette")
+importClassesFrom("graphite", "Pathway")
+importFrom("igraph", "V<-", "V")
+import(ggplot2, graph)
+import(AnnotationDbi)
+## require(org.Hs.eg.db)
 
 exportPattern("^[[:alpha:]]+")

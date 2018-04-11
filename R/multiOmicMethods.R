@@ -79,7 +79,7 @@ summarizeModulesWithPca <- function(data, cliqueGenes, name="exprs", shrink=FALS
   }
 
   pcs$dataModule <- t(dataClique)
-  pcs$method=paste("pca", method)
+  pcs$method="pca"
   pcs$namesCov=colnames(pcs$x)
   pcs
 }

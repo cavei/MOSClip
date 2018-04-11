@@ -1,8 +1,5 @@
 plotModuleInGraph <- function(pathway, moduleNumber,
                         makeLegend=NULL, fileName=NULL) {
-  require(igraph)
-  require(AnnotationDbi)
-  require(org.Hs.eg.db)
 
   if (is.null(makeLegend))
     makeLegend <- c(paste("omic",seq_len(length(pathway@modulesView[[moduleNumber]]))))
@@ -25,7 +22,9 @@ plotModuleInGraph <- function(pathway, moduleNumber,
   }
   mark.border=NA
   entrez <- gsub("ENTREZID:", "", names(V(net)))
-  symbol <- select(org.Hs.eg.db, keys=entrez, columns = c("SYMBOL"), keytype="ENTREZID")$SYMBOL
+
+  symbol <- select(org.Hs.eg.db, keys=entrez,
+                   columns = c("SYMBOL"), keytype="ENTREZID")$SYMBOL
 
   if (!is.null(fileName)) {
     pdf(fileName)

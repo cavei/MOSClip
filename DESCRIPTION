@@ -4,7 +4,7 @@ Title: Multi Omics Survival Clip.
 Version: 0.1.0
 Author: Paolo Martini
 Maintainer: Paolo Martini <paolo.martini@unipd.it>
-Description: Allows to compbine multiple omics dimension to perform pathway survival analysis. There are two main mode: multiOmicsSurvivalPathwayTest and muoltiOmicsSurvivalModuleTest. The latter allows the user to dig inside the pathways itself.
+Description: Allows to combine multiple omics dimension to perform pathway survival analysis. There are two main mode: multiOmicsSurvivalPathwayTest and muoltiOmicsSurvivalModuleTest. The latter method allows the user to dig inside the pathways itself.
 License: AGPL-3
 Encoding: UTF-8
 LazyData: true

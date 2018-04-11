@@ -1,9 +1,9 @@
 plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
                             paletteNames=c("r_RdYlBu", "BuGn","Blues"),
                             h = 9, w=7) {
-  require(AnnotationDbi)
-  require(org.Hs.eg.db)
-  require(pheatmap)
+  # require(AnnotationDbi)
+  # require(org.Hs.eg.db)
+  # require(pheatmap)
 
   involved <- guessInvolvementPathway(pathway)
   if(length(paletteNames)!=length(involved)) {
@@ -23,7 +23,7 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
   sampleNamesGrob <- createSamplesNamesGrob(gts[[1]])
   legendGrob <- createAnnotationLegendGrob(gts[[1]])
   layout_matrix <- createLayout(length(hmaps))
-  myplot <- marrangeGrob(grobs=c(hmaps,
+  myplot <- arrangeGrob(grobs=c(hmaps,
                                  list(annotationGrob),
                                  list(sampleNamesGrob),
                                  list(legendGrob)),
@@ -31,7 +31,7 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
   if(!is.null(fileName)) {
     ggsave(filename = fileName, myplot, height = h, width = w)
   } else {
-    myplot
+    plot(myplot)
   }
 }
 
@@ -40,7 +40,7 @@ plotPathwayKM <- function(pathway, formula = "Surv(days, status) ~ PC1",
                           h = 9, w=7) {
 
   checkmate::assertClass(pathway, "MultiOmicsPathway")
-  require(survminer)
+  # require(survminer)
 
   involved <- guessInvolvementPathway(pathway)
   annotationFull <- formatAnnotations(involved, sortBy=NULL)

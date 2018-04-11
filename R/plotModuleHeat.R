@@ -1,9 +1,9 @@
 plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL, fileName=NULL,
                            paletteNames=c("r_RdYlBu", "BuGn","Blues"),
                            h = 9, w=7) {
-  require(AnnotationDbi)
-  require(org.Hs.eg.db)
-  require(pheatmap)
+  # require(AnnotationDbi)
+  # require(org.Hs.eg.db)
+  # require(pheatmap)
 
   moduleGenes <- pathway@modules[[moduleNumber]]
   involved <- guessInvolvement(pathway, moduleNumber = moduleNumber)
@@ -15,7 +15,8 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL, fileName=NULL,
   # Create annotation and sort
   annotationFull <- formatAnnotations(involved, sortBy)
   # generate the heatmaps grobs
-  gts <- lapply(seq_along(involved), createHeatGrobTable, involved=involved, annotationFull=annotationFull, palettes=paletteNames)
+  gts <- lapply(seq_along(involved), createHeatGrobTable, involved=involved,
+                annotationFull=annotationFull, palettes=paletteNames)
 
   hmaps <- lapply(gts, function(x) {
     createHeatmapGrob(x)
@@ -24,7 +25,7 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL, fileName=NULL,
   sampleNamesGrob <- createSamplesNamesGrob(gts[[1]])
   legendGrob <- createAnnotationLegendGrob(gts[[1]])
   layout_matrix <- createLayout(length(hmaps))
-  myplot <- marrangeGrob(grobs=c(hmaps,
+  myplot <- arrangeGrob(grobs=c(hmaps,
                list(annotationGrob),
                list(sampleNamesGrob),
                list(legendGrob)),
@@ -32,15 +33,15 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL, fileName=NULL,
   if(!is.null(fileName)) {
     ggsave(filename = fileName, myplot, height = h, width = w)
   } else {
-    myplot
+    plot(myplot)
   }
 }
 
 plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ PC1",
                          fileName=NULL, paletteName=c("r_RdYlBu", "BuGn","Blues"),
                          h = 9, w=7) {
-  require(survminer)
-  require(survival)
+  # require(survminer)
+  # require(survival)
 
   # moduleGenes <- pathway@modules[[moduleNumber]]
   involved <- guessInvolvement(pathway, moduleNumber = moduleNumber)
@@ -61,7 +62,6 @@ plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ 
     p
   }
 }
-
 
 createHeatGrobTable <- function(i, involved, annotationFull, palettes) {
   heatMatrix <- involved[[i]]$sigModule
@@ -89,8 +89,6 @@ createHeatGrobTable <- function(i, involved, annotationFull, palettes) {
                      color=cls,
                      cluster_rows=cluster_rows,
                      cluster_cols=F,
-                     # cellheight = 2,
-                     # cellwidth = 2,
                      fontsize_row = 6,
                      fontsize_col = 4,
                      labels_row=lbs,

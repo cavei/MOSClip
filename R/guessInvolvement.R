@@ -1,5 +1,4 @@
 guessInvolvement <- function(pathway, moduleNumber, loadThr=0.6, n=3, atleast=1) {
-  # pathway <- multiOmicsReactome[[81]]
   moduleCox <- pathway@coxObjs[[moduleNumber]]
   omics <- pathway@modulesView[[moduleNumber]]
 
