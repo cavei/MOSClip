@@ -6,3 +6,8 @@ extractPvalues <- function(x) {
     return(p)
   }
 }
+
+na2false <- function(x) {
+  x[is.na(x)] <- FALSE
+  x
+}

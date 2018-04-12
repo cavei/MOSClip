@@ -46,6 +46,9 @@ multiOmicsSurvivalPathwayTest <- function(omicsObj, graph, daysStatus,
   if (is.null(covariates))
     return(NULL)
 
+  if (!identical(row.names(daysStatus), row.names(covariates)))
+    stop("Mismatch in covariates and daysStatus annotations rownames.")
+
   coxObj <- data.frame(daysStatus, covariates)
 
   formula = survFormula

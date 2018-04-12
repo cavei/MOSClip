@@ -29,9 +29,10 @@ MOMSurvTest <- function(genes, omicsObj, annot,
   if (is.null(additionalCovariates))
     return(NULL)
 
-  coxObj <- data.frame(coxObj, additionalCovariates)
+  if (!identical(row.names(coxObj), row.names(additionalCovariates)))
+    stop("Mismatch in covariates and daysStatus annotations rownames.")
 
-  formula = survFormula
+  coxObj <- data.frame(coxObj, additionalCovariates)
   if (autoCompleteFormula)
     formula = paste0(survFormula, paste(colnames(additionalCovariates), collapse="+"))
 

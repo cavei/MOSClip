@@ -1,7 +1,7 @@
 importFrom("houseOfClipUtility",
            "makePositiveDefinite",
            "computePCs", "compPCs", "topoCompPCs", "sparseCompPCs",
-           "computeSupertestFrequences", "runSupertest",
+           "computeSupertestFrequencies", "runSupertest",
            "getPathFathers",
            "mapPathwaysIDfromGraphite")
 
