@@ -1,9 +1,6 @@
 plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL, fileName=NULL,
                            paletteNames=c("r_RdYlBu", "BuGn","Blues"),
                            h = 9, w=7) {
-  # require(AnnotationDbi)
-  # require(org.Hs.eg.db)
-  # require(pheatmap)
 
   moduleGenes <- pathway@modules[[moduleNumber]]
   involved <- guessInvolvement(pathway, moduleNumber = moduleNumber)
@@ -40,10 +37,6 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL, fileName=NULL,
 plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ PC1",
                          fileName=NULL, paletteName=c("r_RdYlBu", "BuGn","Blues"),
                          h = 9, w=7) {
-  # require(survminer)
-  # require(survival)
-
-  # moduleGenes <- pathway@modules[[moduleNumber]]
   involved <- guessInvolvement(pathway, moduleNumber = moduleNumber)
 
   # Create annotation and sort
