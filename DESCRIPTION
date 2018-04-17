@@ -9,6 +9,6 @@ License: AGPL-3
 Encoding: UTF-8
 LazyData: true
 Depends: 
-Imports: methods, survClip, survminer, clipper, graph, CrightArm
+Imports: methods, survClip, survminer, clipper, graph, houseOfClipUtility
 Suggests: RUnit, BiocGenerics, graphite, MASS, BiocStyle, org.Hs.eg.db
 License: AGPL-3
