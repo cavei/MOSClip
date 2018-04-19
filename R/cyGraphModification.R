@@ -39,14 +39,13 @@ plotGraphiteInCy <- function (nattributes, attributeClass, graph) {
   
   mydata <- new("graphNEL", edgemode = "directed",
                 nodes = unique(c(as.character(row.names(nattributes)), edge.nodes)))
-  # nattributes[, 1] <- as.character(nattributes[, 1])
 
   mydata = graph::addEdge(paste(edges[, 1], edges[,2], sep=":"),
                           paste(edges[, 3], edges[,4], sep=":"), mydata)
   
   mydata <- RCy3::initEdgeAttribute(graph = mydata, attribute.name = "type",
-                                    attribute.type = "char", default.value = "undefined")
-
+                                   attribute.type = "char", default.value = "undefined")
+  
   graph::edgeData(mydata,
                   paste(edges[, 1], edges[,2], sep=":"),
                   paste(edges[, 3], edges[,4], sep=":"), 
@@ -58,11 +57,13 @@ plotGraphiteInCy <- function (nattributes, attributeClass, graph) {
                                         attributeClass = attributeClass)
   
   cyG <- RCy3::CytoscapeWindow(title, graph = mydata, overwriteWindow = TRUE)
-  RCy3::setNodeLabelRule(cyG, "label")
+  # RCy3::setVisualStyle(cyG, "Directed")
   RCy3::displayGraph(cyG)
   RCy3::layoutNetwork(cyG, "kamada-kawai")
-  return(mydata)
-  
+  RCy3::setEdgeLabelRule(cyG, "type")
+  RCy3::setNodeLabelRule(cyG, "label")
+  RCy3::displayGraph(cyG)
+  return(invisible(list(gNEL=mydata, cy=cyG)))
 }
 
 addNodeAttributesToGraphNEL <- function(graph, attributes,
@@ -101,4 +102,32 @@ createBiClasses <- function(coxObj, covs) {
 }
 
 
+plotGraphNELInCy <- function (nattributes, attributeClass, graph, title="pathway1") {
+  mydata <- graph
+  mydata <- addNodeAttributesToGraphNEL(mydata, nattributes,
+                                        attributeClass = attributeClass)
+  
+  cyG <- RCy3::CytoscapeWindow(title, graph = mydata, overwriteWindow = TRUE)
+  RCy3::setVisualStyle(cyG, "Directed")
+  RCy3::setNodeLabelRule(cyG, "label")
+  RCy3::displayGraph(cyG)
+  RCy3::layoutNetwork(cyG, "kamada-kawai")
+  return(mydata)
+}
+
+createBinaryMatrix <- function(discrete, markAs1=c("high", "TRUE")) {
+  binary <- matrix(0, nrow=nrow(discrete), ncol=ncol(discrete))
+  binary[discrete=="high"] <- 1
+  binary[discrete=="TRUE"] <- 1
+  colnames(binary) <- colnames(discrete)
+  row.names(binary) <- row.names(discrete)
+  binary
+}
+
+keepFirstOccurrence <- function(m){
+  dup <- duplicated(row.names(m))
+  # validIdx <- match(unique(row.names(m)), row.names(m))
+  # m[validIdx, , drop=F]
+  m[!dup, , drop=F]
+}
 
