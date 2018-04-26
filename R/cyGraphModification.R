@@ -28,10 +28,6 @@
 }
 
 plotGraphiteInCy <- function (nattributes, attributeClass, graph) {
-  # nattributes <- data.frame(row.names=graphite::nodes(TP53.sig.symbol),
-  # serial=paste0("N_",seq_along(graphite::nodes(TP53.sig.symbol))))
-  # edges <- graphite::edges(TP53.sig.symbol)
-  # attributeClass = data.frame(row.names=c("serial"), class="char", stringsAsFactors = F)
   edges <- graphite::edges(graph)
   title <- graph@title
   edge.nodes <- unique(c(paste(edges$src_type,edges$src, sep=":"),
@@ -51,8 +47,6 @@ plotGraphiteInCy <- function (nattributes, attributeClass, graph) {
                   paste(edges[, 3], edges[,4], sep=":"), 
                   attr = "type") <- as.character(edges$type)
   
-  # mydata <- RCy3::initNodeAttribute(mydata, "type", "char", "undefined")
-  # mydata <- RCy3::initNodeAttribute(mydata, "label", "char", "undefined")
   mydata <- addNodeAttributesToGraphNEL(mydata, nattributes,
                                         attributeClass = attributeClass)
   
@@ -86,7 +80,6 @@ addNodeAttributesToGraphNEL <- function(graph, attributes,
   for (a in colnames(attributes)) {
     graph::nodeData(g, row.names(attributes), a) = attributes[,a]
   }
-  # nodeData (g, 'A', 'lfc') <- -1.2
   return(g)
 }
 
@@ -124,10 +117,8 @@ createBinaryMatrix <- function(discrete, markAs1=c("high", "TRUE")) {
   binary
 }
 
-keepFirstOccurrence <- function(m){
-  dup <- duplicated(row.names(m))
-  # validIdx <- match(unique(row.names(m)), row.names(m))
-  # m[validIdx, , drop=F]
+keepFirstOccurrence <- function(m, whichCol){
+  dup <- duplicated(m[,whichCol])
   m[!dup, , drop=F]
 }
 
