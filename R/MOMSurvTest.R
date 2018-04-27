@@ -5,7 +5,7 @@ MOMSurvTest <- function(genes, omicsObj, annot,
 
   # check if topological method has been used
   for (i in seq_along(omicsObj@data)) {
-    if (omicsObj@methods[i] == "summarizeModulesWithPca") {
+    if (omicsObj@methods[i] == "summarizeWithPca") {
       if (omicsObj@specificArgs[[i]]$method=="topological") {
         stop("Topological: not valid method for module analysis.")
       }

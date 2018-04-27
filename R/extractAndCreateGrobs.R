@@ -1,3 +1,36 @@
+generateHeatmapGrobTable <- function(i, involved, annotationFull, palettes) {
+  heatMatrix <- involved[[i]]$sigModule
+  heatMatrix <- heatMatrix[, row.names(annotationFull), drop=F]
+  
+  lbs = row.names(heatMatrix)
+  if (any(grep("ENTREZID:", row.names(heatMatrix)))){
+    lbs <- entrez2symbol(row.names(heatMatrix))
+  }
+  
+  splitted <- unlist(strsplit(palettes[i],"_"))
+  if (length(splitted)==1) {
+    cls <- colorRampPalette(brewer.pal(n = 7, name=splitted))(100)
+  } else if (length(splitted) ==2 & splitted[1] == "r") {
+    cls <- colorRampPalette(rev(brewer.pal(n = 7, name=splitted[2])))(100)
+  } else {
+    stop("Palette name definition error. See documentation for details")
+  }
+  
+  cluster_rows=T
+  if (nrow(heatMatrix) < 2) {
+    cluster_rows=F
+  }
+  pheatmap::pheatmap(heatMatrix,
+                     color=cls,
+                     cluster_rows=cluster_rows,
+                     cluster_cols=F,
+                     fontsize_row = 6,
+                     fontsize_col = 4,
+                     labels_row=lbs,
+                     annotation_col=annotationFull,
+                     silent=TRUE)$gtable
+}
+
 createHeatmapGrob <- function(gtable) {
   idxs <- c(extractHeatmapGrobIndex(gtable),
             extractRowNamesGrobIndex(gtable),

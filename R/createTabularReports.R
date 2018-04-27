@@ -1,14 +1,23 @@
-multiPathwayReport <- function(multiPathway){
-  if (!is(multiPathway,"list"))
+#' Summarize pathways' info from a list of MultiOmicsPathway (MOP)
+#'
+#' Given the list of MOPs, it create the table.
+#'
+#' @param multiPathwayList MultiOmicsPathway pathway object list
+#'
+#' @return a data.frame with overal pvalue of the coxph, followed by covariates zs.
+#'
+#' @export
+multiPathwayReport <- function(multiPathwayList){
+  if (!is(multiPathwayList,"list"))
     stop("A list of pathway results are expected.")
 
-  pvalues <- sapply(multiPathway, function(p) {as.numeric(p@pvalue)})
+  pvalues <- sapply(multiPathwayList, function(p) {as.numeric(p@pvalue)})
 
-  zs <- sort(unique(unlist(lapply(multiPathway, function(p) {
+  zs <- sort(unique(unlist(lapply(multiPathwayList, function(p) {
     names(p@zlist)
   }))))
 
-  zMat <- do.call(rbind, lapply(multiPathway, function(p) {
+  zMat <- do.call(rbind, lapply(multiPathwayList, function(p) {
     fixedCols=rep(NA, length(zs))
     names(fixedCols)<-zs
     fixedCols[names(p@zlist)] <- p@zlist
@@ -19,7 +28,16 @@ multiPathwayReport <- function(multiPathway){
   cbind(row.names=names(pvalues)[ord], pvalue=pvalues[ord], data.frame(zMat[ord, , drop=F]))
 }
 
-multiPathwayModuleReport <- function(multiPathwayModuleList, top=25) {
+#' Summarize pathways' Module info from a list of MultiOmicsModule (MOM) objects
+#'
+#' Given the list of MOMs, it create the table.
+#'
+#' @param multiPathwayModuleList MultiOmicsModule list of pathway
+#'
+#' @return a data.frame with overal pvalue of the coxph, followed by covariates zs.
+#'
+#' @export
+multiPathwayModuleReport <- function(multiPathwayModuleList) {
   if (!is(multiPathwayModuleList,"list"))
     stop("A list of pathway results are expected.")
 
@@ -75,4 +93,3 @@ mergeAll <- function(list) {
   data.frame(pathway=matrix[, "pathway"], module=matrix[, "module"], pvalue=matrix[, "pvalue"],
              apply(numericMat, 2, as.numeric), stringsAsFactors = F)
 }
-

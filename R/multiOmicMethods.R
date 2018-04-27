@@ -1,15 +1,35 @@
+#' Get available Omics Summarizing Methods
+#'
+#' Gives a vector of the available methods to summarize omics.
+#'
+#' @return character vector with the implemented methods.
+#'
+#' @export
 availableOmicsMethods <- function() {
-  return(c("summarizeModulesInCluster",
-           "summarizeModulesToBinaryEvents",
-           "summarizeModulesWithPca"))
+  return(c("summarizeInCluster",
+           "summarizeToBinaryEvents",
+           "summarizeWithPca"))
 }
 
-summarizeModulesToBinaryEvents <- function(data, cliqueGenes, name="cov",
+#' Summarize To Binary Events
+#'
+#' Given a matrix it summarize to a 0 or 1
+#'
+#' @param data a data matrix
+#' @param features a vector with the features to analyze
+#' @param name prefix of the covariates
+#' @param binaryClassMin the minimum number of event to include the covariate
+#' @param cliques the features organized in cliques. Only use for topology.
+#'
+#' @return NULL
+#'
+#' @export
+summarizeToBinaryEvents <- function(data, features, name="cov",
                                            binaryClassMin=10, cliques=NULL) {
   if (is.null(data))
     return(NULL)
 
-  genes <- intersect(row.names(data), cliqueGenes)
+  genes <- intersect(row.names(data), features)
   if (length(genes)==0)
     return(NULL)
 
@@ -27,13 +47,25 @@ summarizeModulesToBinaryEvents <- function(data, cliqueGenes, name="cov",
   list(x=collapsed, dataModule=t(dataClique), namesCov=name, method="binary")
 }
 
-summarizeModulesInCluster <- function(data, cliqueGenes, name="clust", cliques=NULL) {
+#' Summarize Using CLuster Analysis
+#'
+#' Given a matrix it summarize to a 0 or 1
+#'
+#' @param data a data matrix
+#' @param features a vector with the features to analyze
+#' @param name prefix of the covariates
+#' @param cliques the features organized in cliques. Only use for topology.
+#'
+#' @return NULL
+#'
+#' @export
+summarizeInCluster <- function(data, features, name="clust", cliques=NULL) {
   datamat <- data$met ## modificare in modo che se non c'è un dizionario usi i geni stessi
   dict <- data$dict
 
   if (is.null(datamat))
     return(NULL)
-  genes <- intersect(names(dict), cliqueGenes)
+  genes <- intersect(names(dict), features)
 
   if (length(genes)==0)
     return(NULL)
@@ -59,11 +91,27 @@ summarizeModulesInCluster <- function(data, cliqueGenes, name="clust", cliques=N
   list(x=collapse, dataModule=t(datamatClique), namesCov=names(covs), cls=used, method="cluster")
 }
 
-summarizeModulesWithPca <- function(data, cliqueGenes, name="exprs", shrink=FALSE, method="regular", cliques=NULL, maxPCs=3, loadThr=0.6) {
+#' Summarize Using PCA
+#'
+#' Given a matrix it summarize to a 0 or 1
+#'
+#' @param data a data matrix
+#' @param features a vector with the features to analyze
+#' @param name prefix of the covariates
+#' @param shrink shirnk or not the covariance matrix.
+#' @param method either "regular", "sparse" or "topological"
+#' @param cliques the features organized in cliques. Only use for topology.
+#' @param maxPCs maximum number of pcs to consider
+#' @param loadThr loading threshold
+#'
+#' @return NULL
+#'
+#' @export
+summarizeWithPca <- function(data, features, name="exprs", shrink=FALSE, method="regular", cliques=NULL, maxPCs=3, loadThr=0.6) {
   if (is.null(data))
     return(NULL)
 
-  genes <- intersect(row.names(data), cliqueGenes)
+  genes <- intersect(row.names(data), features)
   if (length(genes)==0)
     return(NULL)
 

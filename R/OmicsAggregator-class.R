@@ -1,3 +1,15 @@
+#' Multi Omics Storage that extends \code{"list"} class.
+#'
+#' This class is the storage for the different omic datasets that we need to analyze.
+#'
+#' @slot data list of datasets.
+#' @slot methods a character vector with length equal to length(data) that are methods to process each dataset.
+#' @slot specificArgs a list with length equal to length(data) to set additional parameters specific of the methods.
+#'
+#' @name Omics-class
+#' @rdname Omics-class
+#' @export
+
 check_Omics <- function(object) {
   if (length(object@data) != length(object@methods)){
     msg <- "Data and relative methods to analyze them must be equal in length."
@@ -28,8 +40,6 @@ Omics <- setClass("Omics", package = "MOSClip",
 
 setMethod("initialize", "Omics",
           function(.Object, data, methods, specificArgs, ...) {
-            # .Object <- callNextMethod() ????
-
             if (length(data) != length(methods))
               stop("data and relative methods to analyze them must be equal in length.")
 

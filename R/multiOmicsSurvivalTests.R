@@ -1,3 +1,19 @@
+#' Compute Multi Omics Survival in Pathways
+#'
+#' Performs topological survival analysis using an 'Omics' object.
+#'
+#' @param omicsObj Object of class 'Omics'
+#' @param graph a pathway in graphNEL, Pathway or geneset format.
+#' @param daysStatus survival annotation: days and status (0,1). Row.names are samples
+#' @param survFormula Formula to compute survival
+#' @param autoCompleteFormula logical. If TRUE autocomplete the survFormula using all the available covariates
+#' @param useThisGenes vector of genes used to filter pathways
+#' @param pathName title of the pathway. If NULL and graph is "Pathway" graph@title is used as title
+#'
+#' @return MultiOmicsPathway object
+#'
+#' @export
+
 multiOmicsSurvivalPathwayTest <- function(omicsObj, graph, daysStatus,
                                      survFormula = "Surv(days, status) ~",
                                      autoCompleteFormula=T, useThisGenes=NULL,
@@ -17,7 +33,7 @@ multiOmicsSurvivalPathwayTest <- function(omicsObj, graph, daysStatus,
     specificArgs <- omicsObj@specificArgs[[i]]
 
     cliques=NULL
-    if (omicsObj@methods[i]=="summarizeModulesWithPca") {
+    if (omicsObj@methods[i]=="summarizeWithPca") {
       genesToUse <- intersect(row.names(omicsObj@data[[i]]), genesToUse)
       graph <- graph::subGraph(genesToUse, graph)
       cliques <- clipper:::extractCliquesFromDag(graph)
@@ -64,7 +80,21 @@ multiOmicsSurvivalPathwayTest <- function(omicsObj, graph, daysStatus,
       graphNEL=graph, title=pathName)
 }
 
-
+#' Compute Multi Omics Survival in Pathway Modules
+#'
+#' Performs survival analysis using an 'Omics' object. The pathway (graph) used is decomposed in modules (cliques) using graph theory.
+#'
+#' @param omicsObj Object of class 'Omics'
+#' @param graph a pathway in graphNEL, Pathway or geneset format.
+#' @param daysStatus survival annotation: days and status (0,1). Row.names are samples
+#' @param survFormula Formula to compute survival
+#' @param autoCompleteFormula logical. If TRUE autocomplete the survFormula using all the available covariates
+#' @param useThisGenes vector of genes used to filter pathways
+#' @param pathName title of the pathway. If NULL and graph is "Pathway" graph@title is used as title
+#'
+#' @return MultiOmicsModules object
+#'
+#' @export
 multiOmicsSurvivalModuleTest <- function(omicsObj, graph, daysStatus,
                                      survFormula = "Surv(days, status) ~",
                                      autoCompleteFormula=T, useThisGenes=NULL,

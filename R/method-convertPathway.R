@@ -1,6 +1,8 @@
 setClassUnion("characterOrNULL", c("character", "NULL"))
 
 setGeneric("convertPathway", function(graph, useThisGenes) standardGeneric("convertPathway"))
+
+#' @importClassesFrom graphite Pathway
 setMethod("convertPathway",
           signature("Pathway", "characterOrNULL"),
           function(graph, useThisGenes) {
@@ -12,6 +14,7 @@ setMethod("convertPathway",
             graph
           })
 
+#' @importClassesFrom graph graphNEL
 setMethod("convertPathway",
           signature("graphNEL", "characterOrNULL"),
           function(graph, useThisGenes) {
