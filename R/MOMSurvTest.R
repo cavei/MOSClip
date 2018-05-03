@@ -1,7 +1,11 @@
+
+#' @importFrom methods new
+#' @importFrom survival Surv
+
 MOMSurvTest <- function(genes, omicsObj, annot,
                                   survFormula = "Surv(days, status) ~",
                                   autoCompleteFormula=T) {
-  require(survival)
+  
 
   # check if topological method has been used
   for (i in seq_along(omicsObj@data)) {
@@ -36,7 +40,7 @@ MOMSurvTest <- function(genes, omicsObj, annot,
   if (autoCompleteFormula)
     formula = paste0(survFormula, paste(colnames(additionalCovariates), collapse="+"))
 
-  scox <- suppressWarnings(survClip:::survivalcox(coxObj, formula)) ### Check warnings
+  scox <- suppressWarnings(survClip::survivalcox(coxObj, formula)) ### Check warnings
   scox$moView <- moView
   scox$formula <- formula
   scox$moduleData <- moduleData

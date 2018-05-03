@@ -9,11 +9,11 @@ guessInvolvementPathway(pathway, loadThr = 0.6, n = 3, atleast = 1)
 \arguments{
 \item{pathway}{MultiOmicsPathway from a pathway.}
 
-\item{loadThr=0.6}{the leading threshold to select genes (PCA only)}
+\item{loadThr}{the leading threshold to select genes (PCA only)}
 
-\item{n=3}{the maximum number of genes to retrive (cluster and binary only)}
+\item{n}{the maximum number of genes to retrive (cluster and binary only)}
 
-\item{atleast=1}{the minimum number of features to select (PCA only)}
+\item{atleast}{the minimum number of features to select (PCA only)}
 }
 \value{
 For each omic analyzed a list that is the summary for omic summarized using the setted method: pvalues are present only for cluster method.

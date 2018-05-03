@@ -2,14 +2,17 @@
 % Please edit documentation in R/plottingMO.R
 \name{plotModuleInGraph}
 \alias{plotModuleInGraph}
-\title{Plot KM of the module by omics}
+\title{Plot graph of the module by omics}
 \usage{
-plotModuleInGraph(pathway, moduleNumber, makeLegend = NULL, fileName = NULL)
+plotModuleInGraph(pathway, moduleNumber, orgDbi = "org.Hs.eg.db",
+  makeLegend = NULL, fileName = NULL)
 }
 \arguments{
 \item{pathway}{MultiOmicsModule pathway object}
 
 \item{moduleNumber}{a module number}
+
+\item{orgDbi}{if needed, a organism Dbi to translate vectors}
 
 \item{makeLegend}{set up your favourite names for the omics}
 

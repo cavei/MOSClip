@@ -1,6 +1,6 @@
 Package: MOSClip
 Type: Package
-Title: Multi Omics Survival Clip.
+Title: Multi Omics Survival Clip
 Version: 0.2.0
 Author: Paolo Martini
 Maintainer: Paolo Martini <paolo.martini@unipd.it>
@@ -8,7 +8,7 @@ Description: Allows to combine multiple omics dimension to perform pathway survi
 Encoding: UTF-8
 LazyData: true
 Depends: 
-Imports: methods, survClip, survminer, clipper, graph, houseOfClipUtility
-Suggests: RUnit, BiocGenerics, graphite, MASS, BiocStyle, org.Hs.eg.db
+Imports: methods, survClip, survminer, clipper, graph, houseOfClipUtility, graphite, AnnotationDbi, checkmate, ggplot2, gridExtra, igraph, pheatmap, survival, RColorBrewer, RCy3
+Suggests: RUnit, BiocGenerics, MASS, BiocStyle, org.Hs.eg.db
 License: AGPL-3
 RoxygenNote: 6.0.1

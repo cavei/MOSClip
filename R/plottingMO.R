@@ -10,15 +10,16 @@
 #' @param w the width of the plot
 #'
 #' @return NULL
-#'
+#' @importFrom pheatmap pheatmap
+#' @importFrom gridExtra arrangeGrob
+#' @importFrom ggplot2 ggsave
+#' @importFrom graphics plot
+#' 
 #' @export
 plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
                             paletteNames=c("r_RdYlBu", "BuGn","Blues"),
                             h = 9, w=7) {
-  # require(AnnotationDbi)
-  # require(org.Hs.eg.db)
-  # require(pheatmap)
-  
+
   involved <- guessInvolvementPathway(pathway)
   if(length(paletteNames)!=length(involved)) {
     repTimes <- ceiling(length(involved)/length(paletteNames))
@@ -37,13 +38,13 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
   sampleNamesGrob <- createSamplesNamesGrob(gts[[1]])
   legendGrob <- createAnnotationLegendGrob(gts[[1]])
   layout_matrix <- createLayout(length(hmaps))
-  myplot <- arrangeGrob(grobs=c(hmaps,
+  myplot <- gridExtra::arrangeGrob(grobs=c(hmaps,
                                 list(annotationGrob),
                                 list(sampleNamesGrob),
                                 list(legendGrob)),
                         layout_matrix = layout_matrix)
   if(!is.null(fileName)) {
-    ggsave(filename = fileName, myplot, height = h, width = w)
+    ggplot2::ggsave(filename = fileName, myplot, height = h, width = w)
   } else {
     plot(myplot)
   }
@@ -54,7 +55,6 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
 #' Given the pathway, it creates the Kaplan-meier curves following the formula.
 #'
 #' @param pathway MultiOmicsModule pathway object
-#' @param moduleNumber a module number
 #' @param formula a formula to compute the plot
 #' @param fileName optional filenames to save the plot
 #' @param paletteNames three palettes
@@ -63,25 +63,29 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
 #'
 #' @return NULL
 #'
+#' @importFrom checkmate assertClass
+#' @importFrom pheatmap pheatmap
+#' @importFrom gridExtra arrangeGrob
+#' @importFrom survminer ggsurvplot surv_fit
+#' @importFrom ggplot2 ggsave
+#' 
 #' @export
 plotPathwayKM <- function(pathway, formula = "Surv(days, status) ~ PC1",
-                          fileName=NULL, paletteName=c("r_RdYlBu", "BuGn","Blues"),
+                          fileName=NULL, paletteNames=c("r_RdYlBu", "BuGn","Blues"),
                           h = 9, w=7) {
   
   checkmate::assertClass(pathway, "MultiOmicsPathway")
-  # require(survminer)
   
   involved <- guessInvolvementPathway(pathway)
   annotationFull <- formatAnnotations(involved, sortBy=NULL)
   daysAndStatus <- pathway@coxObj[, c("status", "days"), drop=F]
   coxObj <- data.frame(daysAndStatus, annotationFull[row.names(daysAndStatus), , drop=F])
   
-  fit <- surv_fit(formula(formula), data = coxObj)
-  # survDF <- surv_summary(fit, data=coxObj)
-  p <- ggsurvplot(fit, data = coxObj, risk.table = TRUE, pval=T)
+  fit <- survminer::surv_fit(formula(formula), data = coxObj)
+  p <- survminer::ggsurvplot(fit, data = coxObj, risk.table = TRUE, pval=T)
   
   if(!is.null(fileName)) {
-    ggsave(filename = fileName, p, height = h, width = w)
+    ggplot2::ggsave(filename = fileName, p, height = h, width = w)
   } else {
     p
   }
@@ -100,9 +104,12 @@ plotPathwayKM <- function(pathway, formula = "Surv(days, status) ~ PC1",
 #' @param w the width of the plot
 #'
 #' @return NULL
-#'
+#' @importFrom pheatmap pheatmap
+#' @importFrom gridExtra arrangeGrob
+#' @importFrom ggplot2 ggsave
+#' @importFrom graphics plot
+#' 
 #' @export
-
 plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL, fileName=NULL,
                            paletteNames=c("r_RdYlBu", "BuGn","Blues"),
                            h = 9, w=7) {
@@ -127,13 +134,13 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL, fileName=NULL,
   sampleNamesGrob <- createSamplesNamesGrob(gts[[1]])
   legendGrob <- createAnnotationLegendGrob(gts[[1]])
   layout_matrix <- createLayout(length(hmaps))
-  myplot <- arrangeGrob(grobs=c(hmaps,
+  myplot <- gridExtra::arrangeGrob(grobs=c(hmaps,
                list(annotationGrob),
                list(sampleNamesGrob),
                list(legendGrob)),
                layout_matrix = layout_matrix)
   if(!is.null(fileName)) {
-    ggsave(filename = fileName, myplot, height = h, width = w)
+    ggplot2::ggsave(filename = fileName, myplot, height = h, width = w)
   } else {
     plot(myplot)
   }
@@ -153,10 +160,15 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL, fileName=NULL,
 #' @param w the width of the plot
 #'
 #' @return NULL
-#'
+#' @importFrom checkmate assertClass
+#' @importFrom pheatmap pheatmap
+#' @importFrom gridExtra arrangeGrob
+#' @importFrom survminer ggsurvplot surv_fit
+#' @importFrom ggplot2 ggsave
+#' 
 #' @export
 plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ PC1",
-                         fileName=NULL, paletteName=c("r_RdYlBu", "BuGn","Blues"),
+                         fileName=NULL, paletteNames=c("r_RdYlBu", "BuGn","Blues"),
                          h = 9, w=7) {
   involved <- guessInvolvement(pathway, moduleNumber = moduleNumber)
 
@@ -166,30 +178,35 @@ plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ 
   daysAndStatus <- pathway@coxObjs[[moduleNumber]][, c("status", "days"), drop=F]
   coxObj <- data.frame(daysAndStatus, annotationFull[row.names(daysAndStatus), , drop=F])
 
-  fit <- surv_fit(formula(formula), data = coxObj)
-  # survDF <- surv_summary(fit, data=coxObj)
-  p <- ggsurvplot(fit, data = coxObj, risk.table = TRUE, pval=T)
+  fit <- survminer::surv_fit(formula(formula), data = coxObj)
+  p <- survminer::ggsurvplot(fit, data = coxObj, risk.table = TRUE, pval=T)
 
   if(!is.null(fileName)) {
-    ggsave(filename = fileName, p, height = h, width = w)
+    ggplot2::ggsave(filename = fileName, p, height = h, width = w)
   } else {
     p
   }
 }
 
-#' Plot KM of the module by omics
+#' Plot graph of the module by omics
 #'
 #' Given the pathway, it creates the Kaplan-meier curves following the formula.
 #'
 #' @param pathway MultiOmicsModule pathway object
 #' @param moduleNumber a module number
+#' @param orgDbi if needed, a organism Dbi to translate vectors
 #' @param makeLegend set up your favourite names for the omics
 #' @param fileName optional filenames to save the plot
 #'
 #' @return NULL
-#'
+#' 
+#' @importFrom igraph V V<- simplify igraph.from.graphNEL
+#' @importFrom AnnotationDbi select
+#' @importFrom graphics plot legend
+#' @importFrom grDevices dev.off pdf
+#' 
 #' @export
-plotModuleInGraph <- function(pathway, moduleNumber,
+plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
                               makeLegend=NULL, fileName=NULL) {
   if (is.null(makeLegend))
     makeLegend <- c(paste("omic",seq_len(length(pathway@modulesView[[moduleNumber]]))))
@@ -213,9 +230,9 @@ plotModuleInGraph <- function(pathway, moduleNumber,
   mark.border=NA
   
   
-  if (length(grep("ENTREZID:", names(V(net)))) > 0) {
+  if (length(grep("ENTREZID:", names(V(net)))) > 0 & requireNamespace(orgDbi)) {
     entrez <- gsub("ENTREZID:", "", names(V(net)))
-    symbol <- select(org.Hs.eg.db, keys=entrez,
+    symbol <- select(get(orgDbi), keys=entrez,
                      columns = c("SYMBOL"), keytype="ENTREZID")$SYMBOL
   }
   
@@ -231,7 +248,6 @@ plotModuleInGraph <- function(pathway, moduleNumber,
   }
 }
 
-
 #' Summarize and plot pathways' info from a list of MultiOmicsPathway (MOP)
 #'
 #' Given the list of MOPs, it plots the table.
@@ -240,6 +256,10 @@ plotModuleInGraph <- function(pathway, moduleNumber,
 #'
 #' @return NULL
 #'
+#' @importFrom pheatmap pheatmap
+#' @importFrom grDevices colorRampPalette
+#' @importFrom RColorBrewer brewer.pal
+#' 
 #' @export
 plotMultiPathwayReport <- function(multiPathwayList){
   if(!is.list(multiPathwayList))
@@ -260,7 +280,9 @@ plotMultiPathwayReport <- function(multiPathwayList){
 #' @param pathwayObj MultiOmicsModule of pathway object
 #'
 #' @return NULL
-#'
+#' @importFrom pheatmap pheatmap
+#' @importFrom grDevices colorRampPalette
+#' @importFrom RColorBrewer brewer.pal
 #' @export
 plotModuleReport <- function(pathwayObj) {
   summary <- formatModuleReport(pathwayObj)

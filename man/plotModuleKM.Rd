@@ -5,7 +5,7 @@
 \title{Plot KM of the module by omics}
 \usage{
 plotModuleKM(pathway, moduleNumber, formula = "Surv(days, status) ~ PC1",
-  fileName = NULL, paletteName = c("r_RdYlBu", "BuGn", "Blues"), h = 9,
+  fileName = NULL, paletteNames = c("r_RdYlBu", "BuGn", "Blues"), h = 9,
   w = 7)
 }
 \arguments{
@@ -17,11 +17,11 @@ plotModuleKM(pathway, moduleNumber, formula = "Surv(days, status) ~ PC1",
 
 \item{fileName}{optional filenames to save the plot}
 
+\item{paletteNames}{three palettes}
+
 \item{h}{the height of the plot}
 
 \item{w}{the width of the plot}
-
-\item{paletteNames}{three palettes}
 }
 \description{
 Given the pathway, it creates the Kaplan-meier curves following the formula.

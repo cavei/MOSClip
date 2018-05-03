@@ -40,7 +40,7 @@ mostlyMutated <- function(moduleMat) {
 #' \item{subset}{data.frame(row.names=names(topGenes), metClust=topGenes)}
 #' \item{pvalues}{Kruskal Wallis pvalues of the selected features}
 #' \item{covsConsidered}{the name of the considered omic}
-#'
+#' @importFrom utils head
 #' @export
 extractSummaryFromCluster <-function(omic, n=3) {
   moduleMat <- t(omic$dataModule)
@@ -62,6 +62,7 @@ extractSummaryFromCluster <-function(omic, n=3) {
        covsConsidered=omic$namesCov)
 }
 
+#' @importFrom stats kruskal.test
 KWtest <- function(moduleMat, classes) {
   kwTest <- apply(moduleMat, 2, function(gene) {
     kruskal.test(x=gene, g=classes)[c("p.value", "statistic")]
@@ -97,13 +98,12 @@ extractSummaryFromPCA <- function(omic, moduleCox, loadThr=0.6, atleast=1) {
   list(sigModule=sigModule, discrete=discretePC, subset=topLoad, covsConsidered=covs)
 }
 
+#' @importFrom survminer surv_cutpoint surv_categorize
 createDiscreteClasses <- function(coxObj, covs) {
-  require(survminer)
   diff <- setdiff(covs, colnames(coxObj))
   if (length(diff) != 0) {
     stop(paste0(paste(diff, collapse=", "), " not in coxObj."))
   }
-  
   sc <- surv_cutpoint(coxObj, time="days", event="status", variables = covs)
   surv_categorize(sc)
 }

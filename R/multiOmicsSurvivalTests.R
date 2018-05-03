@@ -12,6 +12,9 @@
 #'
 #' @return MultiOmicsPathway object
 #'
+#' @importFrom graph nodes
+#' @importFrom methods new is
+#' @importFrom survival Surv
 #' @export
 
 multiOmicsSurvivalPathwayTest <- function(omicsObj, graph, daysStatus,
@@ -24,7 +27,7 @@ multiOmicsSurvivalPathwayTest <- function(omicsObj, graph, daysStatus,
   }
 
   graph <- convertPathway(graph, useThisGenes)
-  genesToUse <- nodes(graph)
+  genesToUse <- graph::nodes(graph)
   if (length(genesToUse)== 0)
     stop("There is no nodes on the graph.")
 
@@ -94,6 +97,9 @@ multiOmicsSurvivalPathwayTest <- function(omicsObj, graph, daysStatus,
 #'
 #' @return MultiOmicsModules object
 #'
+#' @importFrom graph nodes
+#' @importFrom methods new is
+#' @importFrom survival Surv
 #' @export
 multiOmicsSurvivalModuleTest <- function(omicsObj, graph, daysStatus,
                                      survFormula = "Surv(days, status) ~",
@@ -108,7 +114,7 @@ multiOmicsSurvivalModuleTest <- function(omicsObj, graph, daysStatus,
 
   graph <- convertPathway(graph, useThisGenes)
 
-  genes <- nodes(graph)
+  genes <- graph::nodes(graph)
   if (length(genes)== 0)
     stop("There is no intersection between expression feature names and the node names on the graph.")
 

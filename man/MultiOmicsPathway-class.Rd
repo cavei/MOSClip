@@ -3,19 +3,9 @@
 \docType{class}
 \name{MultiOmicsPathway-class}
 \alias{MultiOmicsPathway-class}
-\alias{MultiOmicsPathway}
-\alias{MultiOmicsPathway-class}
-\alias{plotMultiOmicsPathway,MultiOmicsPathway-method}
 \title{Multi Omics Pathway that extends \code{"list"} class.}
-\usage{
-plotMultiOmicsPathway(object)
-
-\S4method{plotMultiOmicsPathway}{MultiOmicsPathway}(object)
-}
 \description{
 This class organize the results of the Multi Omics Module Survival Test analysis.
-
-Method plotMultiOmicsPathway.
 }
 \section{Slots}{
 

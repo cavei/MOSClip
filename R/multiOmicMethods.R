@@ -5,7 +5,7 @@
 #' @return character vector with the implemented methods.
 #'
 #' @export
-availableOmicsMethods <- function() {
+availableOmicMethods <- function() {
   return(c("summarizeInCluster",
            "summarizeToBinaryEvents",
            "summarizeWithPca"))
@@ -57,7 +57,7 @@ summarizeToBinaryEvents <- function(data, features, name="cov",
 #' @param cliques the features organized in cliques. Only use for topology.
 #'
 #' @return NULL
-#'
+#' @importFrom stats cutree dist hclust
 #' @export
 summarizeInCluster <- function(data, features, name="clust", cliques=NULL) {
   datamat <- data$met ## modificare in modo che se non c'è un dizionario usi i geni stessi
@@ -105,7 +105,8 @@ summarizeInCluster <- function(data, features, name="clust", cliques=NULL) {
 #' @param loadThr loading threshold
 #'
 #' @return NULL
-#'
+#' @importFrom stats sd
+#' @importFrom houseOfClipUtility computePCs
 #' @export
 summarizeWithPca <- function(data, features, name="exprs", shrink=FALSE, method="regular", cliques=NULL, maxPCs=3, loadThr=0.6) {
   if (is.null(data))

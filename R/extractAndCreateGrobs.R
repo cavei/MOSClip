@@ -1,3 +1,6 @@
+#' @importFrom grDevices colorRampPalette
+#' @importFrom RColorBrewer brewer.pal
+#' @importFrom pheatmap pheatmap
 generateHeatmapGrobTable <- function(i, involved, annotationFull, palettes) {
   heatMatrix <- involved[[i]]$sigModule
   heatMatrix <- heatMatrix[, row.names(annotationFull), drop=F]
@@ -31,6 +34,8 @@ generateHeatmapGrobTable <- function(i, involved, annotationFull, palettes) {
                      silent=TRUE)$gtable
 }
 
+#' @importFrom grid viewport
+#' @importFrom gridExtra arrangeGrob
 createHeatmapGrob <- function(gtable) {
   idxs <- c(extractHeatmapGrobIndex(gtable),
             extractRowNamesGrobIndex(gtable),
@@ -43,6 +48,8 @@ createHeatmapGrob <- function(gtable) {
               vp=viewport(width=0.99, height=0.99))
 }
 
+#' @importFrom grid viewport
+#' @importFrom gridExtra arrangeGrob
 createTopAnnotationGrob <- function(gtable) {
   idxs <- c(extractAnnotationColGrobIndex(gtable),
             extractAnnotationColNamesGrobIndex(gtable))
@@ -54,6 +61,8 @@ createTopAnnotationGrob <- function(gtable) {
               vp=viewport(width=0.99, height=0.99))
 }
 
+#' @importFrom grid viewport
+#' @importFrom gridExtra arrangeGrob
 createSamplesNamesGrob <- function(gtable) {
   idxs <- c(extractSampleNamesGrobIndex(gtable))
   sampleNamesLayout <- cbind(createMatrixLayout(1, 2, 4),
@@ -63,12 +72,16 @@ createSamplesNamesGrob <- function(gtable) {
               vp=viewport(width=0.99, height=0.99))
 }
 
+#' @importFrom grid viewport
+#' @importFrom gridExtra arrangeGrob
 createAnnotationLegendGrob <- function(gtable) {
   idxs <- extractAnnotationLegendGrobIndex(gtable)
   arrangeGrob(grobs=gtable$grobs[idxs], layout_matrix = matrix(1,1,1),
               vp=viewport(width=0.99, height=0.99))
 }
 
+#' @importFrom gridExtra arrangeGrob
+#' @importFrom grid textGrob
 createPlaceOlder <- function() {
   arrangeGrob(textGrob(""), layout_matrix = matrix(1,1,1))
 }

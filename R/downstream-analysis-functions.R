@@ -10,7 +10,22 @@ addOmicsName <- function(nms, omicN, sep=".") {
   paste0(omicN, sep, nms)
 }
 
-summarizeColumnsByMask <- function(table, mask, simplifyToLogicalMatrix=FALSE, thr=0.05) {
+#' Multi Omics Module Inter Module Analysis
+#'
+#' Given the results summary, it extract the lowest pvalue according to the sMask factor.
+#'
+#' @param table the table that summarized the module results
+#' @param mask a factor to summarize. 'rm' marked columns are dropped
+#' @param thr significance threshold
+#'
+#' @return a list
+#' \item{table}{the original table without the modules without at least one covariate significant}
+#' \item{sigMask}{for each module and omics, TRUE/FALSE for significance}
+#' \item{sumPvalues}{pvalues summaries for each omics}
+#'
+#' @importFrom houseOfClipUtility summarizeOmicsResByMinPvalue createSignificanceMask
+#' @export
+summarizeColumnsByMask <- function(table, mask, thr=0.05) {
   if (!is.factor(mask))
     stop("mask must be a factor.")
   
@@ -25,10 +40,23 @@ summarizeColumnsByMask <- function(table, mask, simplifyToLogicalMatrix=FALSE, t
   list(table=table, sigMask=sigMask, sumPvalues=MOM)
 }
 
+
+#' Multi Omics Module Inter Module Analysis
+#'
+#' Given a list of pathway results along with the summary table, it summaizes all module results 
+#'
+#' @param moduleSummary the table that summarized the module results
+#' @param summaryMask a factor to summarize. 'rm' marked columns are dropped
+#' @param momTestObj the list of MOM results
+#' @param thr significance threshold
+#'
+#' @return a list
+#' \item{sigOmicsPart}{for each Omic the significant}
+#' \item{pvaluesSummary}{for each omic, the minimum pvalue}
+#' \item{allGenes}{the genes used}
+#'
+#' @export
 multiOmicsModuleInterAnalysis <- function(moduleSummary, summaryMask, momTestObj, thr=0.05) {
-  # moduleSummary <- moduleSummary.sig[moduleSummary.sig$pathway %in% pathwaysWithTP53, , drop=F]
-  # summaryMask <- factor(c("rm", "rm", "rm", "methy", "methy", "methy", "mutation", "expr", "expr", "expr"))
-  # momTestObj <- multiOmicsReactome
   if (!is.factor(summaryMask))
     stop("summaryMask must be a factor.")
   cols <- colnames(moduleSummary)
@@ -37,7 +65,7 @@ multiOmicsModuleInterAnalysis <- function(moduleSummary, summaryMask, momTestObj
          The summaryMask will be converte in factors and used to merge columns (lowest pvalue is keep).
          Columns marked with \"rm\" are removed.")
   
-  summary <- summarizeColumnsByMask(moduleSummary, summaryMask, TRUE, thr)
+  summary <- summarizeColumnsByMask(moduleSummary, summaryMask, thr)
 
   pathway <- summary$table$pathway
   moduleNumber <- as.numeric(summary$table$module)
@@ -69,6 +97,17 @@ multiOmicsModuleInterAnalysis <- function(moduleSummary, summaryMask, momTestObj
   list(sigOmicsPart=byOmicsSig, pvaluesSummary=summary, allGenes=modulesGenes)
 }
 
+#' Extract the worst profile
+#'
+#' Extract the profile with the lowest survival time.
+#'
+#' @param coxDiscrete the discrete table genes x samples 
+#'
+#' @return a data frame with covatiate (cov) and its profile associated to the bad prognosis
+#' @importFrom survival Surv
+#' @importFrom survminer surv_median surv_fit
+#' @importFrom stats as.formula
+#' @export
 extractBadPrognosisProfile <- function(coxDiscrete) {
   if (!all(c("days", "status") %in% colnames(coxDiscrete)))
     stop("coxDiscrete must contain days and status.")
@@ -85,6 +124,19 @@ extractBadPrognosisProfile <- function(coxDiscrete) {
   data.frame(cov=mt[,1], profile=mt[,2], stringsAsFactors = F)
 }
 
+#' Plot the patients barcodes
+#'
+#' Given the patients' classes of the genes and the worst prognosis, the function produces a plot of the barcodes.
+#'
+#' 
+#' @param coxDiscrete the discrete table genes x samples 
+#' @param worstProfile a data.frame as produced by extractBadPrognosisProfile
+#'
+#' @return NULL
+#' 
+#' @importFrom grDevices colorRampPalette
+#' @importFrom pheatmap pheatmap
+#' @export
 plotSurvivalBarcodes <- function(coxDiscrete, worstProfile) {
   if (!all(c("days", "status") %in% colnames(coxDiscrete)))
     stop("coxDiscrete must contain days and status.")
@@ -104,7 +156,7 @@ plotSurvivalBarcodes <- function(coxDiscrete, worstProfile) {
   ppalette <- colorRampPalette(brewer.pal(6,"Purples"))(12)
 
   pheatmap(binary[order(geneImpact), order(patientsImpact)], 
-           col=c(0,1),
+           color=c(0,1),
            cellheight = 10,
            # cellwidth=1.1,
            # clustering_distance_rows = "binary", 

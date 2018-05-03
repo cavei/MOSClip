@@ -4,9 +4,9 @@
 #'
 #' @param pathway MultiOmicsModule from a pathway.
 #' @param moduleNumber the module number
-#' @param loadThr=0.6 the leading threshold to select genes (PCA only)
-#' @param n=3 the maximum number of genes to retrive (cluster and binary only)
-#' @param atleast=1 the minimum number of features to select (PCA only)
+#' @param loadThr the leading threshold to select genes (PCA only)
+#' @param n the maximum number of genes to retrive (cluster and binary only)
+#' @param atleast the minimum number of features to select (PCA only)
 #'
 #' @return For each omic analyzed a list that is the summary for omic summarized using the setted method: pvalues are present only for cluster method.
 #' \item{sigModule}{the original data for significant features}
@@ -38,9 +38,9 @@ guessInvolvement <- function(pathway, moduleNumber, loadThr=0.6, n=3, atleast=1)
 #' Given a pathway analyzed by MultiOmicsPathwaySurvivalTest it retrieve for each omic the most influent fetures.
 #'
 #' @param pathway MultiOmicsPathway from a pathway.
-#' @param loadThr=0.6 the leading threshold to select genes (PCA only)
-#' @param n=3 the maximum number of genes to retrive (cluster and binary only)
-#' @param atleast=1 the minimum number of features to select (PCA only)
+#' @param loadThr the leading threshold to select genes (PCA only)
+#' @param n the maximum number of genes to retrive (cluster and binary only)
+#' @param atleast the minimum number of features to select (PCA only)
 #'
 #' @return For each omic analyzed a list that is the summary for omic summarized using the setted method: pvalues are present only for cluster method.
 #' \item{sigModule}{the original data for significant features}
@@ -67,27 +67,27 @@ guessInvolvementPathway <- function(pathway, loadThr=0.6, n=3, atleast=1) {
   })
 }
 
-extractSigInvolved <- function(sigOmicsIndex, pathway, moduleNumber, loadThr=0.6, n=3, atleast=1) {
-  if (is.null(sigOmicsIndex) || length(sigOmicsIndex)==0)
-    return(NULL)
-  omics <- pathway@modulesView[[moduleNumber]]
-
-  if (length(sigOmicsIndex)>length(omics))
-    stop("sigOmicsIndex greater that omics considered.")
-  if (max(sigOmicsIndex)>length(omics))
-    stop("sigOmicsIndex greater that omics considered.")
-
-  moduleCox <- pathway@coxObjs[[moduleNumber]]
-  lapply(sigOmicsIndex, function(idx) {
-    omic<-omics[[idx]]
-    if(omic$method=="pca") {
-      extractSummaryFromPCA(omic, moduleCox, loadThr, atleast)
-    } else if (omic$method=="cluster") {
-      extractSummaryFromCluster(omic, n)
-    } else if (omic$method=="binary") {
-      extractSummaryFromBinary(omic, n)
-    } else {
-      stop("Unsupported method.")
-    }
-  })
-}
+# extractSigInvolved <- function(sigOmicsIndex, pathway, moduleNumber, loadThr=0.6, n=3, atleast=1) {
+#   if (is.null(sigOmicsIndex) || length(sigOmicsIndex)==0)
+#     return(NULL)
+#   omics <- pathway@modulesView[[moduleNumber]]
+# 
+#   if (length(sigOmicsIndex)>length(omics))
+#     stop("sigOmicsIndex greater that omics considered.")
+#   if (max(sigOmicsIndex)>length(omics))
+#     stop("sigOmicsIndex greater that omics considered.")
+# 
+#   moduleCox <- pathway@coxObjs[[moduleNumber]]
+#   lapply(sigOmicsIndex, function(idx) {
+#     omic<-omics[[idx]]
+#     if(omic$method=="pca") {
+#       extractSummaryFromPCA(omic, moduleCox, loadThr, atleast)
+#     } else if (omic$method=="cluster") {
+#       extractSummaryFromCluster(omic, n)
+#     } else if (omic$method=="binary") {
+#       extractSummaryFromBinary(omic, n)
+#     } else {
+#       stop("Unsupported method.")
+#     }
+#   })
+# }

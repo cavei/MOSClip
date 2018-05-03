@@ -1,6 +1,6 @@
-entrez2symbol <- function(entrez) {
+entrez2symbol <- function(entrez, annDbi="org.Hs.eg.db") {
   entrez <- gsub("ENTREZID:", "", entrez)
-  symbol <- select(org.Hs.eg.db, keys=entrez, columns = c("SYMBOL"), keytype="ENTREZID")$SYMBOL
+  symbol <- select(get(annDbi), keys=entrez, columns = c("SYMBOL"), keytype="ENTREZID")$SYMBOL
   symbol
 }
 
