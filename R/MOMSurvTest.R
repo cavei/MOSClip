@@ -52,7 +52,7 @@ createMOMView <- function(omicsObj, genes) {
   listCovariates <- lapply(seq_along(omicsObj@data), function(i) {
     test <- get(omicsObj@methods[i])
     specificArgs <- omicsObj@specificArgs[[i]]
-    args <- list(data=omicsObj@data[[i]], cliqueGenes=genes)
+    args <- list(data=omicsObj@data[[i]], features=genes)
     if (!is.null(specificArgs))
       args <- c(args, specificArgs)
 

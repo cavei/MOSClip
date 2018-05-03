@@ -48,11 +48,7 @@ multiPathwayModuleReport <- function(multiPathwayModuleList) {
   })
 
   resDF <- mergeAll(multiMatrixRes)
-
-  if (top=="all") {
-    top=NROW(resDF)
-  }
-  head(resDF[order(resDF$pvalue), ], min(top, NROW(resDF)))
+  resDF[order(resDF$pvalue), ]
 }
 
 formatModuleReport <- function(smObj){

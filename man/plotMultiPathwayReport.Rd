@@ -4,10 +4,12 @@
 \alias{plotMultiPathwayReport}
 \title{Summarize and plot pathways' info from a list of MultiOmicsPathway (MOP)}
 \usage{
-plotMultiPathwayReport(multiPathwayList)
+plotMultiPathwayReport(multiPathwayList, top = 25)
 }
 \arguments{
 \item{multiPathwayList}{MultiOmicsPathway list pathway object}
+
+\item{top}{use top number of pathways}
 }
 \description{
 Given the list of MOPs, it plots the table.

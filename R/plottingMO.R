@@ -253,6 +253,7 @@ plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
 #' Given the list of MOPs, it plots the table.
 #'
 #' @param multiPathwayList MultiOmicsPathway list pathway object
+#' @param top use top number of pathways
 #'
 #' @return NULL
 #'
@@ -261,7 +262,7 @@ plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
 #' @importFrom RColorBrewer brewer.pal
 #' 
 #' @export
-plotMultiPathwayReport <- function(multiPathwayList){
+plotMultiPathwayReport <- function(multiPathwayList, top=25){
   if(!is.list(multiPathwayList))
     stop("multiPathwayList must be a list.")
   

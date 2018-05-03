@@ -21,7 +21,9 @@ multiOmicsSurvivalPathwayTest <- function(omicsObj, graph, daysStatus,
                                      survFormula = "Surv(days, status) ~",
                                      autoCompleteFormula=T, useThisGenes=NULL,
                                      pathName=NULL) {
-
+  
+  # omicsObj = multiOmics; graph=g ; daysStatus = survAnnot; survFormula = "Surv(days, status) ~"; useThisGenes = genesToConsider; pathName=NULL 
+  
   if (is.null(pathName) && is(graph, "Pathway")) {
     pathName <- graph@title
   }
@@ -42,7 +44,7 @@ multiOmicsSurvivalPathwayTest <- function(omicsObj, graph, daysStatus,
       cliques <- clipper:::extractCliquesFromDag(graph)
     }
 
-    args <- list(data=omicsObj@data[[i]], cliqueGenes=genesToUse, cliques=cliques)
+    args <- list(data=omicsObj@data[[i]], features=genesToUse, cliques=cliques)
 
     if (!is.null(specificArgs))
       args <- c(args, specificArgs)
