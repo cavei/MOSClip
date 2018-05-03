@@ -26,50 +26,34 @@ setClass("MultiOmicsModules", package = "MOSClip",
                    title = "characterOrNULL"),
          contains = "list")
 
-# setMethod("initialize", "MultiOmicsModules", function(.Object,
-#                                                       alphas  = "numeric",
-#                                                       zlists  = "list",
-#                                                       coxObjs = "list",
-#                                                       modulesView  = "list",
-#                                                       modules     = "list",
-#                                                       modulesData = "list",
-#                                                       formulas = "list",
-#                                                       graphNEL = "graphNEL",
-#                                                       title = "characterOrNULL",...) {
-#   .Object <- callNextMethod()
-#   return(.Object)
-# })
+setMethod("show",
+          signature = "MultiOmicsModules",
+          definition = function(object) {
+            sthis <- seq_len(min(length(object@alphas), 3))
+            sthis <- order(object@alphas)[sthis]
 
-# MultiOmicsModules <- function(...) new("MultiOmicsModules", ...)
+            sigCliquesIdx = which(object@alphas <= 0.05)
 
-# setMethod("show",
-#           signature = "MultiOmicsModules",
-#           definition = function(object) {
-#             sthis <- seq_len(min(length(object@alphas), 3))
-#             sthis <- order(object@alphas)[sthis]
-# 
-#             sigCliquesIdx = which(object@alphas <= 0.05)
-# 
-#             if (!is.null(object@title)) {
-#               cat("\"",object@title, "\"\n", sep = "")
-#             }
-# 
-#             for (i in sthis) {
-#               cat(paste0("Module ",i, ": pvalue ", object@alphas[i], "\n"))
-#               covs <- names(which(object@zlists[[i]] <=0.05))
-#               if (length(covs)!=0)
-#                 cat("The following covariates are implicated:\n",paste(covs, collapse=", "),"\n")
-#               cat("Module is composed by the followings:\n")
-#               cat(paste(object@modules[[i]], collapse=", "))
-#               cat("\n-+-\n")
-#             }
-# 
-#             if (length(sthis) < length(sigCliquesIdx)) {
-#               cat(paste0("There are other ", length(sigCliquesIdx)-length(sthis), " cliques with pvalue <= 0.05"))
-#             }
-# 
-#             invisible(NULL)
-#           })
+            if (!is.null(object@title)) {
+              cat("\"",object@title, "\"\n", sep = "")
+            }
+
+            for (i in sthis) {
+              cat(paste0("Module ",i, ": pvalue ", object@alphas[i], "\n"))
+              covs <- names(which(object@zlists[[i]] <=0.05))
+              if (length(covs)!=0)
+                cat("The following covariates are implicated:\n",paste(covs, collapse=", "),"\n")
+              cat("Module is composed by the followings:\n")
+              cat(paste(object@modules[[i]], collapse=", "))
+              cat("\n-+-\n")
+            }
+
+            if (length(sthis) < length(sigCliquesIdx)) {
+              cat(paste0("There are other ", length(sigCliquesIdx)-length(sthis), " cliques with pvalue <= 0.05"))
+            }
+
+            invisible(NULL)
+          })
 
 #' Multi Omics Pathway that extends \code{"list"} class.
 #'
@@ -98,27 +82,12 @@ setClass("MultiOmicsPathway", package = "MOSClip",
                    title = "characterOrNULL"),
          contains = "list")
 
-# setMethod("initialize", "MultiOmicsModules", function(.Object,
-#                                                       pvalue  = "numeric",
-#                                                       zlist  = "numeric",
-#                                                       coxObj = "data.frame",
-#                                                       pathView = "list",
-#                                                       formula = "character",
-#                                                       pathData = "list",
-#                                                       graphNEL = "graphNEL",
-#                                                       title = "characterOrNULL",...) {
-#   .Object <- callNextMethod()
-#   return(.Object)
-# })
-
-# MultiOmicsPathway <- function(...) new("MultiOmicsPathway", ...)
-
-# setMethod("show",
-#           signature = "MultiOmicsPathway",
-#           definition = function(object) {
-#             if (!is.null(object@title)) {
-#               cat("\"",object@title, "\"\n", sep = "")
-#             }
-#             cat(paste0("Pathway overall pvalue: ", object@pvalue, "\n"))
-#             invisible(NULL)
-#           })
+setMethod("show",
+          signature = "MultiOmicsPathway",
+          definition = function(object) {
+            if (!is.null(object@title)) {
+              cat("\"",object@title, "\"\n", sep = "")
+            }
+            cat(paste0("Pathway overall pvalue: ", object@pvalue, "\n"))
+            invisible(NULL)
+          })
