@@ -72,17 +72,27 @@ addNodeAttributesToGraphNEL <- function(graph, attributes,
   return(g)
 }
 
+#' From continous to discrete classes.
+#'
+#' From a continous version of covariates (columns) to 2 discrete classes.
+#'
+#' @param coxObj cox like object with days and status plus covariates
+#' @param covs the covariates to use
+#'
+#' @return discrete version of the selected 'covs'. 
+#' 
+#' @rdname discreteClasses
 #' @importFrom survminer surv_cutpoint surv_categorize
+#' @export
+#' 
 createBiClasses <- function(coxObj, covs) {
   diff <- setdiff(covs, colnames(coxObj))
   if (length(diff) != 0) {
     stop(paste0(paste(diff, collapse=", "), " not in coxObj."))
   }
-  
   sc <- survminer::surv_cutpoint(coxObj, time="days", event="status", variables = covs)
   survminer::surv_categorize(sc)
 }
-
 
 # plotGraphNELInCy <- function (nattributes, attributeClass, graph, title="pathway1") {
 #   mydata <- graph
@@ -97,6 +107,19 @@ createBiClasses <- function(coxObj, covs) {
 #   return(mydata)
 # }
 
+#' Create a binary look for discrete classes.
+#'
+#' From a discrete version of covariates (columns), following markAs1 the function creates the binary version.
+#'
+#' @param discrete discrete version of the covariates (columns)
+#' @param markAs1 the discrete values associated to 1
+#'
+#' @return binary matrix
+#' @examples
+#'   dummy <- matrix(c("high","high","low","TRUE","low","low","high","FALSE"), nrow=4)
+#'   createBinaryMatrix(dummy)
+#' @rdname discreteClasses
+#' @export
 createBinaryMatrix <- function(discrete, markAs1=c("high", "TRUE")) {
   binary <- matrix(0, nrow=nrow(discrete), ncol=ncol(discrete))
   binary[discrete=="high"] <- 1
@@ -106,6 +129,22 @@ createBinaryMatrix <- function(discrete, markAs1=c("high", "TRUE")) {
   binary
 }
 
+#' Keep the first occurrence of a matrix
+#'
+#' From a matrix or data frame keeps onòy the first occurrence according to a column.
+#'
+#' @param m a matrix
+#' @param whichCol the column to select the first occurrence
+#'
+#' @return matrix without duplicates.
+#' @examples
+#'   dummy <- matrix(c("a","b","a","c",1,2,3,4), nrow=4)
+#'   colnames(dummy) <- c("gene", "value")
+#'   keepFirstOccurrence(dummy,1)
+#'   keepFirstOccurrence(dummy,"gene")
+#'   
+#' @rdname discreteClasses
+#' @export
 keepFirstOccurrence <- function(m, whichCol){
   dup <- duplicated(m[,whichCol])
   m[!dup, , drop=F]

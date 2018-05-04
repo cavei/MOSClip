@@ -1,13 +1,52 @@
+#' Strip feature type.
+#'
+#' Remove the type from the gene name.
+#' 
+#' The type is marked with the separator ':' (\code{graphite} style)
+#'
+#' @inheritParams stripOmicsName
+#' @param type the string type to be stripped
+#'
+#' @return a character vector of names stripped
+#' @rdname strip-functions
+#' @export
 stripType <- function(nms, type) {
   sub(paste0(type, ":"), "", nms)
 }
 
+#' Strip omics prefix
+#'
+#' Remove the omic prefix from the gene name.
+#' 
+#' The type is marked with the separator sep
+#'
+#' @param nms character vector of names
+#' @param name the omic name
+#' @param sep the separator
+#'
+#' @return a character vector of names stripped
+#' @rdname strip-functions
+#' @export
+#' 
 stripOmicsName <- function(nms, name, sep=".") {
   sub(paste0(name,sep), "", nms)
 }
 
-addOmicsName <- function(nms, omicN, sep=".") {
-  paste0(omicN, sep, nms)
+#' Add omics prefix
+#'
+#' Add the omic prefix to the gene name.
+#' 
+#' The type is marked with the separator sep.
+#'
+#' @inheritParams stripOmicsName
+#'
+#' @return a character vector of names stripped
+#' 
+#' @rdname strip-functions
+#' @export
+#' 
+addOmicsName <- function(nms, name, sep=".") {
+  paste0(name, sep, nms)
 }
 
 #' Multi Omics Module Inter Module Analysis
