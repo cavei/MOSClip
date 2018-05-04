@@ -170,13 +170,14 @@ extractBadPrognosisProfile <- function(coxDiscrete) {
 #' 
 #' @param coxDiscrete the discrete table genes x samples 
 #' @param worstProfile a data.frame as produced by extractBadPrognosisProfile
+#' @param filename if NA plot in session otherwise plot in filename
 #'
 #' @return NULL
 #' 
 #' @importFrom grDevices colorRampPalette
 #' @importFrom pheatmap pheatmap
 #' @export
-plotSurvivalBarcodes <- function(coxDiscrete, worstProfile) {
+plotSurvivalBarcodes <- function(coxDiscrete, worstProfile, filename=NA) {
   if (!all(c("days", "status") %in% colnames(coxDiscrete)))
     stop("coxDiscrete must contain days and status.")
   daysStatusIdx <- match(c("days", "status"), colnames(coxDiscrete))
@@ -207,7 +208,8 @@ plotSurvivalBarcodes <- function(coxDiscrete, worstProfile) {
            annotation_col = data.frame(patientsImpact),
            annotation_legend=T,
            legend=F,
-           annotation_colors=list(patientsImpact=ppalette))
+           annotation_colors=list(patientsImpact=ppalette),
+           filename=filename)
 }
 
 createNodesAttributesDataFrame <- function(graph, attribListDataFrame) {

@@ -4,12 +4,14 @@
 \alias{plotSurvivalBarcodes}
 \title{Plot the patients barcodes}
 \usage{
-plotSurvivalBarcodes(coxDiscrete, worstProfile)
+plotSurvivalBarcodes(coxDiscrete, worstProfile, filename = NA)
 }
 \arguments{
 \item{coxDiscrete}{the discrete table genes x samples}
 
 \item{worstProfile}{a data.frame as produced by extractBadPrognosisProfile}
+
+\item{filename}{if NA plot in session otherwise plot in filename}
 }
 \description{
 Given the patients' classes of the genes and the worst prognosis, the function produces a plot of the barcodes.
