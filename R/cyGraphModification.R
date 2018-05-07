@@ -2,70 +2,39 @@
 #'
 #' Given the pathway and nodesAttributes create a graph in Cytoscape
 #'
-#' @param nattributes a dataframe with the attribute. Colnames equal to type
-#' @param attributeClass a dataframe with class and class type
 #' @param graph a graph
+#' @param nattributes a dataframe with the attribute. Colnames equal to type
+#' @param main the window title for Cytoscape
 #'
 #' @return invisble list
 #' \item{gNEL}{the graphNEL object}
-#' \item{cy}{the cytoscape connection}
+#' \item{cy}{the cytoscape siud}
 #' 
 #' @importClassesFrom graph graphNEL
-#' @importFrom graph addEdge edgeData
+#' @importFrom graph edgeData
 #' @importFrom graphite edges
-#' @importFrom RCy3 initEdgeAttribute CytoscapeWindow displayGraph layoutNetwork setEdgeLabelRule setNodeLabelRule
+#' @importFrom RCy3 deleteNetwork createNetworkFromGraph loadTableData setNodeLabelMapping setNodeShapeMapping
 #' @export
-plotGraphiteInCy <- function (nattributes, attributeClass, graph) {
-  edges <- graphite::edges(graph)
-  title <- graph@title
-  edge.nodes <- unique(c(paste(edges$src_type,edges$src, sep=":"),
-                         paste(edges$dest_type,edges$dest, sep=":")))
-  
-  mydata <- new("graphNEL", edgemode = "directed",
-                nodes = unique(c(as.character(row.names(nattributes)), edge.nodes)))
-
-  mydata = graph::addEdge(paste(edges[, 1], edges[,2], sep=":"),
-                          paste(edges[, 3], edges[,4], sep=":"), mydata)
-  
-  mydata <- RCy3::initEdgeAttribute(graph = mydata, attribute.name = "type",
-                                   attribute.type = "char", default.value = "undefined")
-  
-  graph::edgeData(mydata,
-                  paste(edges[, 1], edges[,2], sep=":"),
-                  paste(edges[, 3], edges[,4], sep=":"), 
-                  attr = "type") <- as.character(edges$type)
-  
-  mydata <- addNodeAttributesToGraphNEL(mydata, nattributes,
-                                        attributeClass = attributeClass)
-  
-  cyG <- RCy3::CytoscapeWindow(title, graph = mydata, overwriteWindow = TRUE)
-  RCy3::displayGraph(cyG)
-  RCy3::layoutNetwork(cyG, "kamada-kawai")
-  RCy3::setEdgeLabelRule(cyG, "type")
-  RCy3::setNodeLabelRule(cyG, "label")
-  RCy3::displayGraph(cyG)
-  return(invisible(list(gNEL=mydata, cy=cyG)))
+plotGraphiteInCy <- function (graph, nattributes, main="network") {
+  if(requireNamespace("RCy3", quitely=TRUE)) {
+    try(RCy3::deleteNetwork(main), silent = TRUE)
+    g <- markMultiple(graph)
+    suid <- RCy3::createNetworkFromGraph(g, main)
+    if (c("id", "label", "type") %in% colnames(nattributes))
+      stop("Columns id, label, type must me present")
+    RCy3::loadTableData(nattributes, "id", "node")
+    RCy3::setNodeLabelMapping("label")
+    RCy3::setNodeShapeMapping("type", nattributes$type, nattributes$shape)
+    invisible(list(gNEL=g, cy=suid))
+  } else {
+    stop("Package RCy3 not installed. Please install.")
+  }
 }
 
 #' @importFrom RCy3 initNodeAttribute
 #' @importFrom graph nodeData
-addNodeAttributesToGraphNEL <- function(graph, attributes,
-                                        attributeClass=c("char", "integer", "numeric")) {
-  if (length(attributeClass$class) != length(colnames(attributes)))
-    stop("attributeClass must match the attributes number")
-  
-  if (!all(attributeClass$class %in% c("char", "integer", "numeric")))
-    stop(paste("Valid attributes class are", paste(attributeClass, collapse=", ")))
-  
-  attributesDefaut <- list(char="undefined", integer=0, numeric=0.0)
-  
+addNodeAttributesToGraphNEL <- function(graph, attributes) {
   g <- graph
-  for (a in colnames(attributes)) {
-    g <- RCy3::initNodeAttribute(graph=g,
-                           attribute.name=a,
-                           attribute.type=attributeClass[a,, drop=F]$class,
-                           default.value=attributesDefaut[attributeClass[a,, drop=F]$class])
-  }
   for (a in colnames(attributes)) {
     graph::nodeData(g, row.names(attributes), a) = attributes[,a]
   }
@@ -93,19 +62,6 @@ createBiClasses <- function(coxObj, covs) {
   sc <- survminer::surv_cutpoint(coxObj, time="days", event="status", variables = covs)
   survminer::surv_categorize(sc)
 }
-
-# plotGraphNELInCy <- function (nattributes, attributeClass, graph, title="pathway1") {
-#   mydata <- graph
-#   mydata <- addNodeAttributesToGraphNEL(mydata, nattributes,
-#                                         attributeClass = attributeClass)
-#   
-#   cyG <- RCy3::CytoscapeWindow(title, graph = mydata, overwriteWindow = TRUE)
-#   RCy3::setVisualStyle(cyG, "Directed")
-#   RCy3::setNodeLabelRule(cyG, "label")
-#   RCy3::displayGraph(cyG)
-#   RCy3::layoutNetwork(cyG, "kamada-kawai")
-#   return(mydata)
-# }
 
 #' Create a binary look for discrete classes.
 #'
@@ -148,5 +104,22 @@ createBinaryMatrix <- function(discrete, markAs1=c("high", "TRUE")) {
 keepFirstOccurrence <- function(m, whichCol){
   dup <- duplicated(m[,whichCol])
   m[!dup, , drop=F]
+}
+
+markMultiple <- function(g) {
+  d <- graph::edgeData(g)
+  if (length(d) == 0)
+    return(g)
+  
+  ns <- names(d)
+  for (i in 1:length(d)) {
+    tp <- d[[i]]$edgeType
+    if (length(grep(";", tp, fixed=T)) > 0) {
+      nodes <- unlist(strsplit(ns[[i]], "|", fixed=T))
+      graph::edgeData(g, nodes[1], nodes[2], "edgeType") <- "multiple"
+    }
+  }
+  
+  return(g)
 }
 

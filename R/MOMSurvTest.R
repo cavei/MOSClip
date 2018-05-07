@@ -1,7 +1,6 @@
-
 #' @importFrom methods new
 #' @importFrom survival Surv
-
+#' @importFrom survClip survivalcox
 MOMSurvTest <- function(genes, omicsObj, annot,
                                   survFormula = "Surv(days, status) ~",
                                   autoCompleteFormula=T) {

@@ -3,7 +3,7 @@
 \docType{class}
 \name{MultiOmicsPathway-class}
 \alias{MultiOmicsPathway-class}
-\title{Multi Omics Pathway that extends \code{"list"} class.}
+\title{Multi Omics Pathway.}
 \description{
 This class organize the results of the Multi Omics Module Survival Test analysis.
 }

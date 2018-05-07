@@ -13,8 +13,10 @@
 #' @return MultiOmicsPathway object
 #'
 #' @importFrom graph nodes
+#' @importFrom houseOfClipUtility extractCliquesFromDag
 #' @importFrom methods new is
 #' @importFrom survival Surv
+#' @importFrom survClip survivalcox
 #' @export
 
 multiOmicsSurvivalPathwayTest <- function(omicsObj, graph, daysStatus,
@@ -41,7 +43,7 @@ multiOmicsSurvivalPathwayTest <- function(omicsObj, graph, daysStatus,
     if (omicsObj@methods[i]=="summarizeWithPca") {
       genesToUse <- intersect(row.names(omicsObj@data[[i]]), genesToUse)
       graph <- graph::subGraph(genesToUse, graph)
-      cliques <- clipper:::extractCliquesFromDag(graph)
+      cliques <- houseOfClipUtility::extractCliquesFromDag(graph)
     }
 
     args <- list(data=omicsObj@data[[i]], features=genesToUse, cliques=cliques)
@@ -100,8 +102,10 @@ multiOmicsSurvivalPathwayTest <- function(omicsObj, graph, daysStatus,
 #' @return MultiOmicsModules object
 #'
 #' @importFrom graph nodes
+#' @importFrom houseOfClipUtility extractCliquesFromDag
 #' @importFrom methods new is
 #' @importFrom survival Surv
+#' 
 #' @export
 multiOmicsSurvivalModuleTest <- function(omicsObj, graph, daysStatus,
                                      survFormula = "Surv(days, status) ~",
@@ -120,9 +124,8 @@ multiOmicsSurvivalModuleTest <- function(omicsObj, graph, daysStatus,
   if (length(genes)== 0)
     stop("There is no intersection between expression feature names and the node names on the graph.")
 
-  # clipper Function to import
   # create the modules
-  cliques <- clipper:::extractCliquesFromDag(graph)
+  cliques <- houseOfClipUtility::extractCliquesFromDag(graph)
 
   results <- lapply(cliques, MOMSurvTest, omicsObj=omicsObj,
                     annot = daysStatus,

@@ -3,7 +3,7 @@
 \docType{class}
 \name{MultiOmicsModules-class}
 \alias{MultiOmicsModules-class}
-\title{Multi Omics Modules that extends \code{"list"} class.}
+\title{Multi Omics Modules.}
 \description{
 This class organize the results of the Multi Omics Module Survival Test analysis.
 }

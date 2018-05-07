@@ -4,19 +4,19 @@
 \alias{plotGraphiteInCy}
 \title{Plot graph in Cytoscape}
 \usage{
-plotGraphiteInCy(nattributes, attributeClass, graph)
+plotGraphiteInCy(graph, nattributes, main = "network")
 }
 \arguments{
+\item{graph}{a graph}
+
 \item{nattributes}{a dataframe with the attribute. Colnames equal to type}
 
-\item{attributeClass}{a dataframe with class and class type}
-
-\item{graph}{a graph}
+\item{main}{the window title for Cytoscape}
 }
 \value{
 invisble list
 \item{gNEL}{the graphNEL object}
-\item{cy}{the cytoscape connection}
+\item{cy}{the cytoscape siud}
 }
 \description{
 Given the pathway and nodesAttributes create a graph in Cytoscape

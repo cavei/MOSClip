@@ -1,6 +1,6 @@
 setClassUnion("characterOrNULL", c("character", "NULL"))
 
-#' Multi Omics Modules that extends \code{"list"} class.
+#' Multi Omics Modules.
 #'
 #' This class organize the results of the Multi Omics Module Survival Test analysis.
 #'
@@ -55,7 +55,7 @@ setMethod("show",
             invisible(NULL)
           })
 
-#' Multi Omics Pathway that extends \code{"list"} class.
+#' Multi Omics Pathway.
 #'
 #' This class organize the results of the Multi Omics Module Survival Test analysis.
 #'
