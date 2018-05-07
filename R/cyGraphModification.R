@@ -18,13 +18,17 @@
 plotGraphiteInCy <- function (graph, nattributes, main="network") {
   if(requireNamespace("RCy3", quitely=TRUE)) {
     try(RCy3::deleteNetwork(main), silent = TRUE)
+    
+    if (is(graph, "Pathway"))
+      graph <- graphite::pathwayGraph(graph)
+    
     g <- markMultiple(graph)
     suid <- RCy3::createNetworkFromGraph(g, main)
-    if (c("id", "label", "type") %in% colnames(nattributes))
+    if (!all(c("id", "label", "type") %in% colnames(nattributes)))
       stop("Columns id, label, type must me present")
     RCy3::loadTableData(nattributes, "id", "node")
-    RCy3::setNodeLabelMapping("label")
-    RCy3::setNodeShapeMapping("type", nattributes$type, nattributes$shape)
+    # RCy3::setNodeLabelMapping("label", style.name = "default", network=suid)
+    # RCy3::setNodeShapeMapping("type", nattributes$type, "ELLIPSE")
     invisible(list(gNEL=g, cy=suid))
   } else {
     stop("Package RCy3 not installed. Please install.")
