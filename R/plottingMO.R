@@ -213,19 +213,17 @@ plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
   net <- igraph.from.graphNEL(pathway@graphNEL)
   moduleGenes <- pathway@modules[[moduleNumber]]
   net <- simplify(net, remove.multiple = T, remove.loops = T)
-  color <- rep("grey40", length(V(net)))
-  color[names(V(net)) %in% moduleGenes] <- "red"
-  V(net)$label <- NA
-  V(net)$size <- 15
+  color <- rep("grey", length(V(net)))
+  color[names(V(net)) %in% moduleGenes] <- "tomato"
   involved <- guessInvolvement(pathway, moduleNumber = moduleNumber)
   mark.groups=lapply(involved, function(x) {
     row.names(x$subset)
   })
   colLength <- length(mark.groups)
   if (colLength<3) {
-    mark.col=brewer.pal(3, "Set3")[seq_len(colLength)]
+    mark.col=rainbow(3, alpha=0.33)[seq_len(colLength)]
   } else {
-    mark.col=brewer.pal(colLength, "Set3")
+    mark.col=rainbow(colLength, alpha=0.33)
   }
   mark.border=NA
   
@@ -239,8 +237,12 @@ plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
   if (!is.null(fileName)) {
     pdf(fileName)
   }
-  plot(net, edge.arrow.size=.2,vertex.label=symbol, vertex.label.cex=.5, edge.curved=.1,
-       vertex.color=color, mark.groups=mark.groups, mark.col=mark.col, mark.border=NA)
+  plot(net, edge.arrow.size=.5, edge.curved=.2,
+       vertex.label=symbol, vertex.label.cex=.6, vertex.label.family="sans", 
+       vertex.label.font=2, vertex.color=color, vertex.frame.color="gray", 
+       vertex.label.color="black", vertex.size=15,
+       mark.groups=mark.groups, mark.col=mark.col, mark.border=NA
+       )
   legend(x=-1, y=-1, makeLegend, pch=21, horiz=TRUE,
          col="#777777", pt.bg=mark.col, pt.cex=2, cex=.8, bty="n", ncol=1)
   if (!is.null(fileName)) {
