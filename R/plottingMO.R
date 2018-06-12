@@ -203,7 +203,7 @@ plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ 
 #' @importFrom igraph V V<- simplify igraph.from.graphNEL
 #' @importFrom AnnotationDbi select
 #' @importFrom graphics plot legend
-#' @importFrom grDevices dev.off pdf
+#' @importFrom grDevices dev.off pdf rainbow
 #' 
 #' @export
 plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
