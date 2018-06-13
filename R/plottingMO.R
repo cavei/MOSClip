@@ -212,7 +212,7 @@ plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
     makeLegend <- c(paste("omic",seq_len(length(pathway@modulesView[[moduleNumber]]))))
   net <- igraph.from.graphNEL(pathway@graphNEL)
   moduleGenes <- pathway@modules[[moduleNumber]]
-  net <- simplify(net, remove.multiple = T, remove.loops = T)
+  net <- igraph::simplify(net, remove.multiple = T, remove.loops = T)
   color <- rep("grey", length(V(net)))
   color[names(V(net)) %in% moduleGenes] <- "tomato"
   involved <- guessInvolvement(pathway, moduleNumber = moduleNumber)
@@ -227,18 +227,13 @@ plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
   }
   mark.border=NA
   
-  
-  if (length(grep("ENTREZID:", names(V(net)))) > 0 & requireNamespace(orgDbi)) {
-    entrez <- gsub("ENTREZID:", "", names(V(net)))
-    symbol <- select(get(orgDbi), keys=entrez,
-                     columns = c("SYMBOL"), keytype="ENTREZID")$SYMBOL
-  }
+  labels <- conversionToSymbols(names(V(net)), orgDbi)
   
   if (!is.null(fileName)) {
     pdf(fileName)
   }
   plot(net, edge.arrow.size=.5, edge.curved=.2,
-       vertex.label=symbol, vertex.label.cex=.6, vertex.label.family="sans", 
+       vertex.label=labels, vertex.label.cex=.6, vertex.label.family="sans", 
        vertex.label.font=2, vertex.color=color, vertex.frame.color="gray", 
        vertex.label.color="black", vertex.size=15,
        mark.groups=mark.groups, mark.col=mark.col, mark.border=NA
