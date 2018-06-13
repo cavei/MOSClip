@@ -6,9 +6,10 @@
 #'
 #' @export
 availableOmicMethods <- function() {
-  return(c("summarizeInCluster",
-           "summarizeToBinaryEvents",
-           "summarizeWithPca"))
+  return(c("summarizeToBinaryEvents",
+           "summarizeWithPca",
+           "summarizeInCluster",
+           "summarizeInClusterWithoutDictionary"))
 }
 
 #' Summarize To Binary Events
@@ -89,6 +90,46 @@ summarizeInCluster <- function(data, features, name="clust", cliques=NULL) {
   }
   collapse=covs
   list(x=collapse, dataModule=t(datamatClique), namesCov=names(covs), cls=used, method="cluster")
+}
+
+#' Summarize Using Cluster Analysis with no dictionary to translate the matrix ids
+#'
+#' Given a quantitative matrix it clusters the samples 
+#'
+#' @param data a data matrix
+#' @param features a vector with the features to analyze
+#' @param name prefix of the covariates
+#' @param cliques the features organized in cliques. Only use for topology.
+#'
+#' @return NULL
+#' @importFrom stats cutree dist hclust
+#' @export
+summarizeInClusterWithoutDictionary <- function(datamat, features, name="clust", cliques=NULL) {
+  
+  if (is.null(datamat) | (ncol(datamat)==0) | !(is.matrix(datamat)))
+    return(NULL)
+  genes <- intersect(rownames(datamat), features)
+  
+  if (length(genes)==0)
+    return(NULL)
+  
+  datamatClique <- t(datamat[genes, ,drop=FALSE])
+  
+  used <- colnames(datamatClique)
+  names(used) <- colnames(datamatClique)
+  
+  hc <- hclust(dist(datamatClique, method = "euclidean"), method="ward.D2")
+  # clusters <- kmeans(datamatClique, centers=2) # TO DO: add kmeans
+  
+  if (ncol(datamatClique)<4){
+    covs <- data.frame(factor(cutree(hc, k = 2)), stringsAsFactors = T)
+    names(covs) <- paste0(name,"_2k")
+  } else {
+    covs <- data.frame(factor(cutree(hc, k = 3)), stringsAsFactors = T)
+    names(covs) <- paste0(name,"_3k")
+  }
+  
+  list(x=covs, dataModule=t(datamatClique), namesCov=names(covs), cls=used, method="cluster")
 }
 
 #' Summarize Using PCA
