@@ -1,14 +1,15 @@
 #' @importFrom grDevices colorRampPalette
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom pheatmap pheatmap
-generateHeatmapGrobTable <- function(i, involved, annotationFull, palettes) {
+generateHeatmapGrobTable <- function(i, involved, annotationFull, palettes, orgDbi="org.Hs.eg.db") {
   heatMatrix <- involved[[i]]$sigModule
   heatMatrix <- heatMatrix[, row.names(annotationFull), drop=F]
   
-  lbs = row.names(heatMatrix)
-  if (any(grep("ENTREZID:", row.names(heatMatrix)))){
-    lbs <- entrez2symbol(row.names(heatMatrix))
-  }
+  # lbs = row.names(heatMatrix)
+  # if (any(grep("ENTREZID:", row.names(heatMatrix)))){
+  #   lbs <- entrez2symbol(row.names(heatMatrix))
+  # }
+  lbs <- conversionToSymbols(row.names(heatMatrix), orgDbi)
   
   splitted <- unlist(strsplit(palettes[i],"_"))
   if (length(splitted)==1) {
