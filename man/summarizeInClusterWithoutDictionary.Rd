@@ -4,17 +4,17 @@
 \alias{summarizeInClusterWithoutDictionary}
 \title{Summarize Using Cluster Analysis with no dictionary to translate the matrix ids}
 \usage{
-summarizeInClusterWithoutDictionary(datamat, features, name = "clust",
+summarizeInClusterWithoutDictionary(data, features, name = "clust",
   cliques = NULL)
 }
 \arguments{
+\item{data}{a data matrix}
+
 \item{features}{a vector with the features to analyze}
 
 \item{name}{prefix of the covariates}
 
 \item{cliques}{the features organized in cliques. Only use for topology.}
-
-\item{data}{a data matrix}
 }
 \description{
 Given a quantitative matrix it clusters the samples

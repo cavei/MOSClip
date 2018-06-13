@@ -104,16 +104,16 @@ summarizeInCluster <- function(data, features, name="clust", cliques=NULL) {
 #' @return NULL
 #' @importFrom stats cutree dist hclust
 #' @export
-summarizeInClusterWithoutDictionary <- function(datamat, features, name="clust", cliques=NULL) {
+summarizeInClusterWithoutDictionary <- function(data, features, name="clust", cliques=NULL) {
   
-  if (is.null(datamat) | (ncol(datamat)==0) | !(is.matrix(datamat)))
+  if (is.null(data) | (ncol(data)==0) | !(is.matrix(data)))
     return(NULL)
-  genes <- intersect(rownames(datamat), features)
+  genes <- intersect(rownames(data), features)
   
   if (length(genes)==0)
     return(NULL)
   
-  datamatClique <- t(datamat[genes, ,drop=FALSE])
+  datamatClique <- t(data[genes, ,drop=FALSE])
   
   used <- colnames(datamatClique)
   names(used) <- colnames(datamatClique)
