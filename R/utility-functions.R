@@ -1,3 +1,18 @@
+conversionToSymbols <- function(idsGraphiteStyle, orgDbi) {
+  
+  if( requireNamespace(orgDbi) & 
+      length(grep(":", idsGraphiteStyle)) == length(idsGraphiteStyle) ){
+    typeId <- unique(do.call(rbind,(strsplit(idsGraphiteStyle, ":")))[,1])
+    
+    if (length(typeId)==1) {
+      originals <- gsub(paste0(typeId,":"), "", idsGraphiteStyle)
+      symbols <- select(get(orgDbi), keys=originals,
+                        columns = c("SYMBOL"), keytype=typeId)$SYMBOL
+      return(as.character(symbols))
+    }
+  } else {return(idsGraphiteStyle)}
+}
+
 entrez2symbol <- function(entrez, annDbi="org.Hs.eg.db") {
   entrez <- gsub("ENTREZID:", "", entrez)
   symbol <- select(get(annDbi), keys=entrez, columns = c("SYMBOL"), keytype="ENTREZID")$SYMBOL
