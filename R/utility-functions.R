@@ -17,11 +17,12 @@ conversionToSymbols <- function(idsGraphiteStyle, orgDbi="org.Hs.eg.db") {
   as.character(symbols)
 }
 
-entrez2symbol <- function(entrez, annDbi="org.Hs.eg.db") {
-  entrez <- gsub("ENTREZID:", "", entrez)
-  symbol <- select(get(annDbi), keys=entrez, columns = c("SYMBOL"), keytype="ENTREZID")$SYMBOL
-  symbol
-}
+# TO DO: Remove this function because deprecated and replaced with conversionToSymbol. 
+# entrez2symbol <- function(entrez, annDbi="org.Hs.eg.db") {
+#   entrez <- gsub("ENTREZID:", "", entrez)
+#   symbol <- select(get(annDbi), keys=entrez, columns = c("SYMBOL"), keytype="ENTREZID")$SYMBOL
+#   symbol
+# }
 
 formatAnnotations <- function(listOfMostlyInvolvedGenesInOmics, sortBy) {
   involved=listOfMostlyInvolvedGenesInOmics
