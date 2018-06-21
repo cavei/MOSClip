@@ -86,6 +86,7 @@ mergeAll <- function(list) {
                     }))
   removeCols <- match(c("pathway", "module","pvalue"), colnames(matrix))
   numericMat <- matrix[,-removeCols, drop=F]
-  data.frame(pathway=matrix[, "pathway"], module=matrix[, "module"], pvalue=matrix[, "pvalue"],
+  data.frame(pathway=matrix[, "pathway"], module=matrix[, "module"],
+             pvalue=as.numeric(matrix[, "pvalue"]),
              apply(numericMat, 2, as.numeric), stringsAsFactors = F)
 }
