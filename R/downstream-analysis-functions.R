@@ -129,7 +129,9 @@ multiOmicsModuleInterAnalysis <- function(moduleSummary, summaryMask, momTestObj
       pathModule[[i]]$sigModule
     })
     omic <- unique(do.call(rbind, omic))
-    row.names(omic) <- paste0(omicNames[i],".",row.names(omic))
+    if (!is.null(omic)) {
+      row.names(omic) <- paste0(omicNames[i],".",row.names(omic))
+    }
     omic
   })
   names(byOmicsSig) <- omicNames
