@@ -89,6 +89,11 @@ summarizeInCluster <- function(data, features, name="clust", cliques=NULL) {
     names(covs) <- paste0(name,"_3k")
   }
   collapse=covs
+  if (any(table(covs[[1]])<10)){
+    warning("Not meaningful class separation")
+    return(NULL)
+  }
+    
   list(x=collapse, dataModule=t(datamatClique), namesCov=names(covs), cls=used, method="cluster")
 }
 
