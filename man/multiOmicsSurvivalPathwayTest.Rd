@@ -6,7 +6,7 @@
 \usage{
 multiOmicsSurvivalPathwayTest(omicsObj, graph, daysStatus,
   survFormula = "Surv(days, status) ~", autoCompleteFormula = T,
-  useThisGenes = NULL, pathName = NULL)
+  useThisGenes = NULL, pathName = NULL, robust = FALSE)
 }
 \arguments{
 \item{omicsObj}{Object of class 'Omics'}
@@ -22,6 +22,8 @@ multiOmicsSurvivalPathwayTest(omicsObj, graph, daysStatus,
 \item{useThisGenes}{vector of genes used to filter pathways}
 
 \item{pathName}{title of the pathway. If NULL and graph is "Pathway" graph@title is used as title}
+
+\item{robust}{should be used the robust mode for cox}
 }
 \value{
 MultiOmicsPathway object

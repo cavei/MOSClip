@@ -1,11 +1,10 @@
 #' @importFrom methods new
 #' @importFrom survival Surv
-#' @importFrom survClip survivalcox
+#' @importFrom survClip survivalcox survivalcox
 MOMSurvTest <- function(genes, omicsObj, annot,
                                   survFormula = "Surv(days, status) ~",
-                                  autoCompleteFormula=T) {
+                                  autoCompleteFormula=T, robust=FALSE) {
   
-
   # check if topological method has been used
   for (i in seq_along(omicsObj@data)) {
     if (omicsObj@methods[i] == "summarizeWithPca") {
@@ -39,7 +38,11 @@ MOMSurvTest <- function(genes, omicsObj, annot,
   if (autoCompleteFormula)
     formula = paste0(survFormula, paste(colnames(additionalCovariates), collapse="+"))
 
-  scox <- suppressWarnings(survClip::survivalcox(coxObj, formula)) ### Check warnings
+  if (robust) {
+    scox <- suppressWarnings(survClip::survivalcoxr(coxObj, formula)) ### Check warnings
+  } else {
+    scox <- suppressWarnings(survClip::survivalcox(coxObj, formula)) ### Check warnings
+  }
   scox$moView <- moView
   scox$formula <- formula
   scox$moduleData <- moduleData

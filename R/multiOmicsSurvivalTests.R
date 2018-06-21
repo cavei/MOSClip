@@ -9,6 +9,7 @@
 #' @param autoCompleteFormula logical. If TRUE autocomplete the survFormula using all the available covariates
 #' @param useThisGenes vector of genes used to filter pathways
 #' @param pathName title of the pathway. If NULL and graph is "Pathway" graph@title is used as title
+#' @param robust should be used the robust mode for cox
 #'
 #' @return MultiOmicsPathway object
 #'
@@ -16,15 +17,13 @@
 #' @importFrom houseOfClipUtility extractCliquesFromDag
 #' @importFrom methods new is
 #' @importFrom survival Surv
-#' @importFrom survClip survivalcox
+#' @importFrom survClip survivalcox survivalcoxr
 #' @export
 
 multiOmicsSurvivalPathwayTest <- function(omicsObj, graph, daysStatus,
                                      survFormula = "Surv(days, status) ~",
                                      autoCompleteFormula=T, useThisGenes=NULL,
-                                     pathName=NULL) {
-  
-  # omicsObj = multiOmics; graph=g ; daysStatus = survAnnot; survFormula = "Surv(days, status) ~"; useThisGenes = genesToConsider; pathName=NULL 
+                                     pathName=NULL, robust=FALSE) {
   
   if (is.null(pathName) && is(graph, "Pathway")) {
     pathName <- graph@title
@@ -79,7 +78,11 @@ multiOmicsSurvivalPathwayTest <- function(omicsObj, graph, daysStatus,
   if (autoCompleteFormula)
     formula = paste0(survFormula, paste(colnames(covariates), collapse="+"))
 
-  scox <- suppressWarnings(survClip::survivalcox(coxObj, formula)) ### Check warnings
+  if (robust) {
+    scox <- suppressWarnings(survClip::survivalcoxr(coxObj, formula)) ### Check warnings
+  } else {
+    scox <- suppressWarnings(survClip::survivalcox(coxObj, formula)) ### Check warnings
+  }
   new("MultiOmicsPathway", pvalue=scox$pvalue, zlist=scox$zlist, coxObj=scox$coxObj,
       pathView=moduleView, formula=formula,
       graphNEL=graph, title=pathName)
@@ -96,6 +99,7 @@ multiOmicsSurvivalPathwayTest <- function(omicsObj, graph, daysStatus,
 #' @param autoCompleteFormula logical. If TRUE autocomplete the survFormula using all the available covariates
 #' @param useThisGenes vector of genes used to filter pathways
 #' @param pathName title of the pathway. If NULL and graph is "Pathway" graph@title is used as title
+#' @param robust should be used the robust mode for cox
 #'
 #' @return MultiOmicsModules object
 #'
@@ -108,8 +112,8 @@ multiOmicsSurvivalPathwayTest <- function(omicsObj, graph, daysStatus,
 multiOmicsSurvivalModuleTest <- function(omicsObj, graph, daysStatus,
                                      survFormula = "Surv(days, status) ~",
                                      autoCompleteFormula=T, useThisGenes=NULL,
-                                     pathName=NULL) {
-
+                                     pathName=NULL, robust=FALSE) {
+  
   if (is(graph, "character"))
     stop("Module test can not handle gene list.")
 
@@ -128,7 +132,7 @@ multiOmicsSurvivalModuleTest <- function(omicsObj, graph, daysStatus,
   results <- lapply(cliques, MOMSurvTest, omicsObj=omicsObj,
                     annot = daysStatus,
                     survFormula = survFormula,
-                    autoCompleteFormula=autoCompleteFormula)
+                    autoCompleteFormula=autoCompleteFormula, robust=robust)
 
   alphas   <- as.numeric(sapply(results, extractPvalues))
   zlist    <- lapply(results, function(x) x$zlist)
