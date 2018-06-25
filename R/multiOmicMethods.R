@@ -25,7 +25,7 @@ availableOmicMethods <- function() {
 #' @return NULL
 #'
 #' @export
-summarizeToBinaryEvents <- function(data, features, name="cov",
+summarizeToBinaryEvents <- function(data, features, name="binary",
                                            binaryClassMin=10, cliques=NULL) {
   if (is.null(data))
     return(NULL)
@@ -45,7 +45,7 @@ summarizeToBinaryEvents <- function(data, features, name="cov",
 
   collapsed <- data.frame(collapsed, row.names = names(collapsed), stringsAsFactors = F)
   colnames(collapsed) <- name
-  list(x=collapsed, dataModule=t(dataClique), namesCov=name, method="binary")
+  list(x=collapsed, dataModule=t(dataClique), namesCov=name, method="binary", omicName=name)
 }
 
 #' Summarize Using CLuster Analysis
@@ -60,7 +60,7 @@ summarizeToBinaryEvents <- function(data, features, name="cov",
 #' @return NULL
 #' @importFrom stats cutree dist hclust
 #' @export
-summarizeInCluster <- function(data, features, name="clust", cliques=NULL) {
+summarizeInCluster <- function(data, features, name="clu", cliques=NULL) {
   datamat <- data$met ## modificare in modo che se non c'è un dizionario usi i geni stessi
   dict <- data$dict
 
@@ -92,13 +92,14 @@ summarizeInCluster <- function(data, features, name="clust", cliques=NULL) {
     names(covs) <- paste0(name,"_3k")
   }
   collapse=covs
+
   if (any(table(covs[[1]])<2)){
     # warning("Not meaningful class separation\n")
     return(NULL)
   }
     
-  list(x=collapse, dataModule=t(datamatClique), namesCov=names(covs), cls=used, method="cluster")
-}
+  list(x=collapse, dataModule=t(datamatClique), namesCov=names(covs), cls=used, method="cluster", omicName=name)
+  }
 
 #' Summarize Using Cluster Analysis with no dictionary to translate the matrix ids
 #'
@@ -113,7 +114,7 @@ summarizeInCluster <- function(data, features, name="clust", cliques=NULL) {
 #' @importFrom stats cutree dist hclust
 #' @export
 summarizeInClusterWithoutDictionary <- function(data, features, name="clust", cliques=NULL) {
-  
+
   if (is.null(data) | (ncol(data)==0) | !(is.matrix(data)))
     return(NULL)
   genes <- intersect(rownames(data), features)
@@ -140,7 +141,7 @@ summarizeInClusterWithoutDictionary <- function(data, features, name="clust", cl
     names(covs) <- paste0(name,"_3k")
   }
   
-  list(x=covs, dataModule=t(datamatClique), namesCov=names(covs), cls=used, method="cluster")
+  list(x=covs, dataModule=t(datamatClique), namesCov=names(covs), cls=used, method="cluster", omicName=name)
 }
 
 #' Summarize Using PCA
@@ -160,7 +161,7 @@ summarizeInClusterWithoutDictionary <- function(data, features, name="clust", cl
 #' @importFrom stats sd
 #' @importFrom houseOfClipUtility computePCs
 #' @export
-summarizeWithPca <- function(data, features, name="exprs", shrink=FALSE, method="regular", cliques=NULL, maxPCs=3, loadThr=0.6) {
+summarizeWithPca <- function(data, features, name="pca", shrink=FALSE, method="regular", cliques=NULL, maxPCs=3, loadThr=0.6) {
   if (is.null(data))
     return(NULL)
 
@@ -182,5 +183,6 @@ summarizeWithPca <- function(data, features, name="exprs", shrink=FALSE, method=
   pcs$dataModule <- t(dataClique)
   pcs$method="pca"
   pcs$namesCov=colnames(pcs$x)
+  pcs$omicName=name
   pcs
 }
