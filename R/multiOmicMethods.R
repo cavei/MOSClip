@@ -25,7 +25,7 @@ availableOmicMethods <- function() {
 #' @return NULL
 #'
 #' @export
-summarizeToBinaryEvents <- function(data, features, name="binary",
+summarizeToBinaryEvents <- function(data, features, name="bin",
                                            binaryClassMin=10, cliques=NULL) {
   if (is.null(data))
     return(NULL)
@@ -113,7 +113,7 @@ summarizeInCluster <- function(data, features, name="clu", cliques=NULL) {
 #' @return NULL
 #' @importFrom stats cutree dist hclust
 #' @export
-summarizeInClusterWithoutDictionary <- function(data, features, name="clust", cliques=NULL) {
+summarizeInClusterWithoutDictionary <- function(data, features, name="clu", cliques=NULL) {
 
   if (is.null(data) | (ncol(data)==0) | !(is.matrix(data)))
     return(NULL)
@@ -135,10 +135,10 @@ summarizeInClusterWithoutDictionary <- function(data, features, name="clust", cl
   
   if (ncol(datamatClique)<4){
     covs <- data.frame(factor(cutree(hc, k = 2)), stringsAsFactors = T)
-    names(covs) <- paste0(name,"_2k")
+    names(covs) <- paste0(name,"2k")
   } else {
     covs <- data.frame(factor(cutree(hc, k = 3)), stringsAsFactors = T)
-    names(covs) <- paste0(name,"_3k")
+    names(covs) <- paste0(name,"3k")
   }
   
   list(x=covs, dataModule=t(datamatClique), namesCov=names(covs), cls=used, method="cluster", omicName=name)
@@ -175,8 +175,11 @@ summarizeWithPca <- function(data, features, name="pca", shrink=FALSE, method="r
 
   if (NCOL(dataClique)!=1) {
     pcs <- computePCs(dataClique, shrink=shrink, method=method, cliques=cliques, maxPCs=maxPCs)
+    colnames(pcs$x) <- paste0(name,colnames(pcs$x))
+    names(pcs$sdev) <- paste0(name,names(pcs$sdev))
+    colnames(pcs$loading) <- paste0(name,colnames(pcs$loading))
   } else {
-    colnames(dataClique) <- "PC1"
+    colnames(dataClique) <- paste0(name,"PC1")
     pcs <- list(x=dataClique, sdev=sd(dataClique), loadings=1)
   }
 
