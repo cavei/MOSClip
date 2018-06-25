@@ -4,7 +4,7 @@
 \alias{summarizeInClusterWithoutDictionary}
 \title{Summarize Using Cluster Analysis with no dictionary to translate the matrix ids}
 \usage{
-summarizeInClusterWithoutDictionary(data, features, name = "clust",
+summarizeInClusterWithoutDictionary(data, features, name = "clu",
   cliques = NULL)
 }
 \arguments{

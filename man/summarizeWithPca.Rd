@@ -4,7 +4,7 @@
 \alias{summarizeWithPca}
 \title{Summarize Using PCA}
 \usage{
-summarizeWithPca(data, features, name = "exprs", shrink = FALSE,
+summarizeWithPca(data, features, name = "pca", shrink = FALSE,
   method = "regular", cliques = NULL, maxPCs = 3, loadThr = 0.6)
 }
 \arguments{

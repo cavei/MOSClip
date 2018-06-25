@@ -4,7 +4,7 @@
 \alias{summarizeToBinaryEvents}
 \title{Summarize To Binary Events}
 \usage{
-summarizeToBinaryEvents(data, features, name = "cov", binaryClassMin = 10,
+summarizeToBinaryEvents(data, features, name = "bin", binaryClassMin = 10,
   cliques = NULL)
 }
 \arguments{

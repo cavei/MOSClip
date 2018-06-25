@@ -4,7 +4,7 @@
 \alias{summarizeInCluster}
 \title{Summarize Using CLuster Analysis}
 \usage{
-summarizeInCluster(data, features, name = "clust", cliques = NULL)
+summarizeInCluster(data, features, name = "clu", cliques = NULL)
 }
 \arguments{
 \item{data}{a data matrix}
