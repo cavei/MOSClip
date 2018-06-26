@@ -78,7 +78,10 @@ summarizeInCluster <- function(data, features, name="clust", cliques=NULL) {
   if (ncol(datamatClique)==0)
     return(NULL)
 
-  hc <- hclust(dist(datamatClique, method = "euclidean"), method="ward.D2")
+  md <- dist(datamatClique, method = "euclidean")
+  if (any(is.na(md)))
+    return(NULL)
+  hc <- hclust(md, method="ward.D2")
   # clusters <- kmeans(datamatClique, centers=2) # provioamo a implementare anche il Kmeans?
 
   if (ncol(datamatClique)<4){
@@ -123,7 +126,10 @@ summarizeInClusterWithoutDictionary <- function(data, features, name="clust", cl
   used <- colnames(datamatClique)
   names(used) <- colnames(datamatClique)
   
-  hc <- hclust(dist(datamatClique, method = "euclidean"), method="ward.D2")
+  md <- dist(datamatClique, method = "euclidean")
+  if (any(is.na(md)))
+      return(NULL)
+  hc <- hclust(md, method="ward.D2")
   # clusters <- kmeans(datamatClique, centers=2) # TO DO: add kmeans
   
   if (ncol(datamatClique)<4){
