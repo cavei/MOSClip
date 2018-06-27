@@ -1,0 +1,109 @@
+#' Performs statistical tests of the pathway intersections among omics.
+#'
+#' This function calculates intersection sizes among the pathway sets 
+#' significative in each omic and performs statistical intersection test. 
+#'
+#' @param multiPathwayReportData data.frame, the output of 
+#' the \code{\link{multiPathwayReport}} function.
+#' @param pvalueThr integer indicating the p-value cut-off.
+#' @param plot character indicating the layout for plotting. 
+#' It is one of \code{circular}, \code{landscape} or \code{no}. 
+#' By default, plot="circular", if plot="no" no plot will be provided.
+#' @param sort.by character indicating how to sort the 
+#' intersections in the plot. It is one of "set" (by omics), "size" 
+#' (by intersection size), "degree" (by number of intersected omics), 
+#' and "p-value".
+#' @param excludeColumns a vector of characters listing the columns of 
+#' \code{multiPathwayReportData} object to be excluded by the analysis.  
+#'
+#' @details This function calculates intersection sizes between multiple set of pathways 
+#' and performs statistical test of the intersections using the total amout of 
+#' analyzed pathways as background. The algorithm and implemantation 
+#' behind this function was described in Wang et al 2015.
+#'
+#' @return a data.frame containing all the numeric information of the plot included
+#'  the pathways shared by different omics.
+#'
+#' @references 
+#' Minghui Wang, Yongzhong Zhao, and Bin Zhang (2015). 
+#' Efficient Test and Visualization of Multi-Set Intersections. 
+#' Scientific Reports 5: 16923.
+#'
+#' @importFrom SuperExactTest supertest
+#' @importFrom grDevices colorRampPalette
+#' @importFrom RColorBrewer brewer.pal
+#'
+#' @export
+runSupertest <- function(multiPathwayReportData, pvalueThr=0.05,
+                         plot=c('circular','landscape','noplot'), 
+                         sort.by=c('set','size','degree','p-value'),
+                         excludeColumns=NULL){
+  
+  if(!(any(colnames(multiPathwayReportData) %in% "pvalue")))
+    stop("Data malformed. There is not a overall pvalue column.")
+  
+  if(is.null(grep("(PC[0-9]+|[23]k[123]|TRUE|FALSE)$", colnames(multiPathwayReportData))))
+    stop("Data malformed. There are no columns of with covariates as colnames.")
+  
+  if((!is.null(excludeColumns)) & (any(!(excludeColumns %in% colnames(multiPathwayReportData)))))
+    stop("Data malformed. Not all the colnames in excludeColumns are in the data.")
+  
+  if(!is.null(excludeColumns)){
+    if(excludeColumns %in% "pvalue") {
+    stop("You can not exclude the overall pvalue column, it is a required column.")
+    }}
+  
+  if(!is.numeric(pvalueThr))
+    stop("pvalueThr should be numeric.")
+    else if((pvalueThr > 1) | (pvalueThr < 0))
+      stop("pvalueThr should be a number included between 0 and 1.")
+  
+  
+  plot <- plot[1]
+  if(!(plot %in% c('circular','landscape','noplot')))
+    stop("Plot argument should be one of circular, landscape or noplot." )
+  
+  sort.by <- sort.by[1]
+  if(plot != "noplot" & (!(sort.by %in% c('set','size','degree','p-value'))))
+    stop("sort.by argument should be one of set, size, degree or p-value.")
+  
+  columnsNotExcluded <- colnames(multiPathwayReportData)[!(colnames(multiPathwayReportData) %in% excludeColumns)]
+  multiPathwayReportData <- multiPathwayReportData[,columnsNotExcluded]
+  
+  colClasses <- sapply(multiPathwayReportData, class)
+  if(unique(colClasses) != "numeric"){
+    notNumericColumns <- colnames(multiPathwayReportData)[colClasses != "numeric"]
+    stop(paste0("Data malformed.", 
+                "The following columns are not numeric, consider the use of excludeColumns argument: ", 
+                notNumericColumns))
+  }
+  
+  universeSize <- NROW(multiPathwayReportData)
+  multiPathwayReportDataSig <- multiPathwayReportData[multiPathwayReportData[,"pvalue"] <= pvalueThr,]
+  
+  covarColumns <- !(colnames(multiPathwayReportData) %in% "pvalue")
+  multiPathwayReportDataSig <- multiPathwayReportDataSig[,covarColumns]
+  covars <- colnames(multiPathwayReportDataSig)
+  covars2omics <- sub("(PC[0-9]+|[23]k[123]|TRUE|FALSE)$","",
+                     covars, perl=TRUE,ignore.case=FALSE)
+  
+  MOlistPval <- tapply(colnames(multiPathwayReportDataSig),
+                       covars2omics, 
+                       summarizeOmicsResByMinPvalue, 
+                       mat=multiPathwayReportDataSig)
+  
+  MOlistPathSig <- lapply(MOlistPval, function(pp) {
+    names(which(pp <= pvalueThr))})
+  
+  msetSupertest <- SuperExactTest::supertest(MOlistPathSig, n=universeSize)
+  
+  if(plot != "noplot"){
+    plot(msetSupertest,
+         color.on = c("#409ec3"), color.off = "white",
+         heatmapColor = grDevices::colorRampPalette(RColorBrewer::brewer.pal(9,"OrRd"))(100),
+         sort.by = sort.by, Layout=plot)
+  }
+  
+  invisible(summary(msetSupertest)$Table)
+}
+
