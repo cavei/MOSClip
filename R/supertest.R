@@ -4,7 +4,7 @@
 #' significative in each omic and performs statistical intersection test. 
 #'
 #' @param multiPathwayReportData data.frame, the output of 
-#' the \code{\link{multiPathwayReport}} function.
+#' the \code{\link{multiPathwayReport}} or \code{\link{multiPathwayModuleReport}} functions.
 #' @param pvalueThr integer indicating the p-value cut-off.
 #' @param plot character indicating the layout for plotting. 
 #' It is one of \code{circular}, \code{landscape} or \code{no}. 
@@ -14,12 +14,14 @@
 #' (by intersection size), "degree" (by number of intersected omics), 
 #' and "p-value".
 #' @param excludeColumns a vector of characters listing the columns of 
-#' \code{multiPathwayReportData} object to be excluded by the analysis.  
+#' \code{multiPathwayReportData} object to be excluded by the analysis. 
+#' In the case \code{multiPathwayReportData} derives from \code{\link{multiPathwayModuleReport}} 
+#' you should set \code{excludeColumns = c("pathway","module")}. 
 #'
-#' @details This function calculates intersection sizes between multiple set of pathways 
+#' @details This function calculates intersection sizes between multiple set of pathways or modules 
 #' and performs statistical test of the intersections using the total amout of 
-#' analyzed pathways as background. The algorithm and implemantation 
-#' behind this function was described in Wang et al 2015.
+#' analyzed pathways or modules as background. The super exact test of this function 
+#' was described in Wang et al 2015.
 #'
 #' @return a data.frame containing all the numeric information of the plot included
 #'  the pathways shared by different omics.
@@ -39,7 +41,7 @@ runSupertest <- function(multiPathwayReportData, pvalueThr=0.05,
                          sort.by=c('set','size','degree','p-value'),
                          excludeColumns=NULL){
   
-  if(!(any(colnames(multiPathwayReportData) %in% "pvalue")))
+  if(!(any("pvalue" %in% colnames(multiPathwayReportData))))
     stop("Data malformed. There is not a overall pvalue column.")
   
   if(is.null(grep("(PC[0-9]+|[23]k[123]|TRUE|FALSE)$", colnames(multiPathwayReportData))))
@@ -49,7 +51,7 @@ runSupertest <- function(multiPathwayReportData, pvalueThr=0.05,
     stop("Data malformed. Not all the colnames in excludeColumns are in the data.")
   
   if(!is.null(excludeColumns)){
-    if(excludeColumns %in% "pvalue") {
+    if(c("pvalue") %in% excludeColumns) {
     stop("You can not exclude the overall pvalue column, it is a required column.")
     }}
   
@@ -57,7 +59,6 @@ runSupertest <- function(multiPathwayReportData, pvalueThr=0.05,
     stop("pvalueThr should be numeric.")
     else if((pvalueThr > 1) | (pvalueThr < 0))
       stop("pvalueThr should be a number included between 0 and 1.")
-  
   
   plot <- plot[1]
   if(!(plot %in% c('circular','landscape','noplot')))
@@ -74,8 +75,9 @@ runSupertest <- function(multiPathwayReportData, pvalueThr=0.05,
   if(unique(colClasses) != "numeric"){
     notNumericColumns <- colnames(multiPathwayReportData)[colClasses != "numeric"]
     stop(paste0("Data malformed.", 
-                "The following columns are not numeric, consider the use of excludeColumns argument: ", 
-                notNumericColumns))
+                "The following columns are not numeric. 
+                You should consider the use of excludeColumns argument: ", 
+                paste(notNumericColumns, collapse = ", ")))
   }
   
   universeSize <- NROW(multiPathwayReportData)
@@ -101,7 +103,7 @@ runSupertest <- function(multiPathwayReportData, pvalueThr=0.05,
     plot(msetSupertest,
          color.on = c("#409ec3"), color.off = "white",
          heatmapColor = grDevices::colorRampPalette(RColorBrewer::brewer.pal(9,"OrRd"))(100),
-         sort.by = sort.by, Layout=plot)
+         sort.by = sort.by, Layout = plot)
   }
   
   invisible(summary(msetSupertest)$Table)

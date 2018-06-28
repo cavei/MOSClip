@@ -6,11 +6,11 @@
 \usage{
 runSupertest(multiPathwayReportData, pvalueThr = 0.05, plot = c("circular",
   "landscape", "noplot"), sort.by = c("set", "size", "degree", "p-value"),
-  excludeColumns = NULL)
+  excludeColumns = NULL, ...)
 }
 \arguments{
 \item{multiPathwayReportData}{data.frame, the output of 
-the \code{\link{multiPathwayReport}} function.}
+the \code{\link{multiPathwayReport}} or \code{\link{multiPathwayModuleReport}} functions.}
 
 \item{pvalueThr}{integer indicating the p-value cut-off.}
 
@@ -24,7 +24,9 @@ intersections in the plot. It is one of "set" (by omics), "size"
 and "p-value".}
 
 \item{excludeColumns}{a vector of characters listing the columns of 
-\code{multiPathwayReportData} object to be excluded by the analysis.}
+\code{multiPathwayReportData} object to be excluded by the analysis. 
+In the case \code{multiPathwayReportData} derives from \code{\link{multiPathwayModuleReport}} 
+you should set \code{excludeColumns = c("pathway","module")}.}
 }
 \value{
 a data.frame containing all the numeric information of the plot included
@@ -35,10 +37,10 @@ This function calculates intersection sizes among the pathway sets
 significative in each omic and performs statistical intersection test.
 }
 \details{
-This function calculates intersection sizes between multiple set of pathways 
+This function calculates intersection sizes between multiple set of pathways or modules 
 and performs statistical test of the intersections using the total amout of 
-analyzed pathways as background. The algorithm and implemantation 
-behind this function was described in Wang et al 2015.
+analyzed pathways or modules as background. The super exact test of this function 
+was described in Wang et al 2015.
 }
 \references{
 Minghui Wang, Yongzhong Zhao, and Bin Zhang (2015). 
