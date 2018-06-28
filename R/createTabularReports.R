@@ -28,14 +28,14 @@ multiPathwayReport <- function(multiPathwayList){
   cbind(row.names=names(pvalues)[ord], pvalue=pvalues[ord], data.frame(zMat[ord, , drop=F]))
 }
 
-#' Summarize pathways' Module info from a list of MultiOmicsModule (MOM) objects
+#' Provide a data.frame of pathways module test results from list of Multi Omics Module (MOM) objects
 #'
-#' Given the list of MOMs, it create the table.
+#' Given the list of MOMs, it creates the table.
 #'
-#' @param multiPathwayModuleList MultiOmicsModule list of pathway
+#' @param multiPathwayModuleList a list of Multi Omics Modules resulting from a multi-omics module test.
 #'
-#' @return a data.frame with overal pvalue of the coxph, followed by covariates zs.
-#'
+#' @return a data.frame, modules in rows, overall and covariate pvalues of the test in columns.
+#' #'
 #' @export
 multiPathwayModuleReport <- function(multiPathwayModuleList) {
   if (!is(multiPathwayModuleList,"list"))
@@ -46,9 +46,11 @@ multiPathwayModuleReport <- function(multiPathwayModuleList) {
     data.frame(pathway=p@title, module=row.names(summary), summary,
                row.names=NULL, stringsAsFactors = F)
   })
-
   resDF <- mergeAll(multiMatrixRes)
-  resDF[order(resDF$pvalue), ]
+  resDF <- resDF[order(resDF$pvalue), ]
+  rownames(resDF) <- apply(resDF,1, function(r) paste(r["pathway"],r["module"],sep="."))
+  
+  return(resDF)
 }
 
 formatModuleReport <- function(smObj){

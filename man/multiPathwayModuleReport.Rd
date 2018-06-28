@@ -2,16 +2,17 @@
 % Please edit documentation in R/createTabularReports.R
 \name{multiPathwayModuleReport}
 \alias{multiPathwayModuleReport}
-\title{Summarize pathways' Module info from a list of MultiOmicsModule (MOM) objects}
+\title{Provide a data.frame of pathways module test results from list of Multi Omics Module (MOM) objects}
 \usage{
 multiPathwayModuleReport(multiPathwayModuleList)
 }
 \arguments{
-\item{multiPathwayModuleList}{MultiOmicsModule list of pathway}
+\item{multiPathwayModuleList}{a list of Multi Omics Modules resulting from a multi-omics module test.}
 }
 \value{
-a data.frame with overal pvalue of the coxph, followed by covariates zs.
+a data.frame, modules in rows, overall and covariate pvalues of the test in columns.
+#'
 }
 \description{
-Given the list of MOMs, it create the table.
+Given the list of MOMs, it creates the table.
 }
