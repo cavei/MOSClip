@@ -6,7 +6,7 @@
 \usage{
 runSupertest(multiPathwayReportData, pvalueThr = 0.05, plot = c("circular",
   "landscape", "noplot"), sort.by = c("set", "size", "degree", "p-value"),
-  excludeColumns = NULL, ...)
+  excludeColumns = NULL)
 }
 \arguments{
 \item{multiPathwayReportData}{data.frame, the output of 
