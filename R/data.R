@@ -1,6 +1,6 @@
 
 ## Colors
-MOSpalette <- c ("#C90000", "#04B880", "#001Df9", "#E5C002", "#8C04B6", "#01B7BF")
+MOSpalette <- c ("#E33402", "#04B880", "#3871CC", "#E5C002", "#8C04B6", "#01B7BF")
 names(MOSpalette) <- c("red","green","blue","yellow","violet","teal")
 
 MOSpaletteSchema <- data.frame(
@@ -49,3 +49,8 @@ tealShades <- grDevices::colorRampPalette(
            MOSpaletteSchema["teal","smart"]),
   bias=1, space="rgb",
   interpolate="linear", alpha=FALSE)
+
+pvalueShades <- grDevices::colorRampPalette(
+  colors=c("#edf7f5", "#2796bd"),
+  bias=20, space="rgb",
+  interpolate="linear", alpha=FALSE)(100)
