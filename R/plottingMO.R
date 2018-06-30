@@ -264,13 +264,16 @@ plotMultiPathwayReport <- function(multiPathwayList, top=25,
   if(!is.list(multiPathwayList))
     stop("multiPathwayList must be a list.")
   
-  annCol <- sub("(PC[0-9]+|[23]k[123]|TRUE|FALSE)$","",
-                  colnames(summary), perl=TRUE,ignore.case=FALSE)
-  omics <- annCol[2:length(annCol)]
-  
   if(is.null(MOcolors)){
     MOcolors <- names(MOSpalette)[1:length(unique(omics))]
   }
+  
+  summary <- multiPathwayReport(multiPathwayList)
+  top <- min(top, NROW(summary))
+  
+  annCol <- sub("(PC[0-9]+|[23]k[123]|TRUE|FALSE)$","",
+                  colnames(summary), perl=TRUE,ignore.case=FALSE)
+  omics <- annCol[2:length(annCol)]
   
   if(length(MOcolors) != length(unique(omics))){
     stop(paste0("Length of MOcol differs from the number of omics:", unique(omics)))
@@ -280,9 +283,6 @@ plotMultiPathwayReport <- function(multiPathwayList, top=25,
   colors <- c(NA, sapply(unique(omics), function(o) MOSpalette[MOcolors[o]]))
   names(colors) <- unique(annCol)
               
-  summary <- multiPathwayReport(multiPathwayList)
-  top <- min(top, NROW(summary))
-
   ann_columns <- data.frame(omics = factor(annCol))
   rownames(ann_columns) <- colnames(summary)
   
