@@ -251,24 +251,48 @@ plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
 #'
 #' @param multiPathwayList MultiOmicsPathway list pathway object
 #' @param top use top number of pathways
+#' @param MOcolors character vector with the omic colors. 
+#' The colors should be among the color in \code{showMOSpalette()}.
 #'
 #' @return NULL
 #'
 #' @importFrom pheatmap pheatmap
-#' @importFrom grDevices colorRampPalette
-#' @importFrom RColorBrewer brewer.pal
 #' 
 #' @export
-plotMultiPathwayReport <- function(multiPathwayList, top=25){
+plotMultiPathwayReport <- function(multiPathwayList, top=25, 
+                                   MOcolors=NULL){
   if(!is.list(multiPathwayList))
     stop("multiPathwayList must be a list.")
   
+  annCol <- sub("(PC[0-9]+|[23]k[123]|TRUE|FALSE)$","",
+                  colnames(summary), perl=TRUE,ignore.case=FALSE)
+  omics <- annCol[2:length(annCol)]
+  
+  if(is.null(MOcolors)){
+    MOcolors <- names(MOSpalette)[1:length(unique(omics))]
+  }
+  
+  if(length(MOcolors) != length(unique(omics))){
+    stop(paste0("Length of MOcol differs from the number of omics:", unique(omics)))
+  }
+  names(MOcolors) <- unique(omics)
+  
+  colors <- c(NA, sapply(unique(omics), function(o) MOSpalette[MOcolors[o]]))
+  names(colors) <- unique(annCol)
+              
   summary <- multiPathwayReport(multiPathwayList)
   top <- min(top, NROW(summary))
+
+  ann_columns <- data.frame(omics = factor(annCol))
+  rownames(ann_columns) <- colnames(summary)
+  
+  ann_colors <- list(omics = colors)
+  
   pheatmap(summary[seq_len(top),,drop=F], display_numbers = T,
-           color = colorRampPalette(brewer.pal(n = 7, name = "Blues"))(100),
-           cluster_rows = F, cluster_cols = F, gaps_col = c(1),
-           fontsize_row=5)
+           color = pvalueShades, cluster_rows = F, cluster_cols = F, 
+           gaps_col = c(1), fontsize_row=5, fontsize_col = 7,
+           annotation_col = ann_columns, annotation_colors = ann_colors,
+           border_color="white")
 }
 
 #' Summarize and plot pathways' info from a MultiOmicsModule (MOM) object
