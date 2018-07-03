@@ -86,10 +86,10 @@ summarizeInCluster <- function(data, features, name="clu", cliques=NULL) {
 
   if (ncol(datamatClique)<4){
     covs <- data.frame(factor(cutree(hc, k = 2)), stringsAsFactors = T)
-    names(covs) <- paste0(name,"_2k")
+    names(covs) <- paste0(name,"2k")
   } else {
     covs <- data.frame(factor(cutree(hc, k = 3)), stringsAsFactors = T)
-    names(covs) <- paste0(name,"_3k")
+    names(covs) <- paste0(name,"3k")
   }
   collapse=covs
 
@@ -139,6 +139,11 @@ summarizeInClusterWithoutDictionary <- function(data, features, name="clu", cliq
   } else {
     covs <- data.frame(factor(cutree(hc, k = 3)), stringsAsFactors = T)
     names(covs) <- paste0(name,"3k")
+  }
+  
+  if (any(table(covs[[1]])<2)){
+    # warning("Not meaningful class separation\n")
+    return(NULL)
   }
   
   list(x=covs, dataModule=t(datamatClique), namesCov=names(covs), cls=used, method="cluster", omicName=name)

@@ -4,15 +4,17 @@
 \alias{runSupertest}
 \title{Performs statistical tests of the pathway intersections among omics.}
 \usage{
-runSupertest(multiPathwayReportData, pvalueThr = 0.05, plot = c("circular",
-  "landscape", "noplot"), sort.by = c("set", "size", "degree", "p-value"),
-  excludeColumns = NULL)
+runSupertest(multiPathwayReportData, pvalueThr = 0.05, zscoreThr = 0.05,
+  plot = c("circular", "landscape", "noplot"), sort.by = c("set", "size",
+  "degree", "p-value"), excludeColumns = NULL)
 }
 \arguments{
 \item{multiPathwayReportData}{data.frame, the output of 
 the \code{\link{multiPathwayReport}} or \code{\link{multiPathwayModuleReport}} functions.}
 
-\item{pvalueThr}{integer indicating the p-value cut-off.}
+\item{pvalueThr}{numeric indicating the cut-off for overall pvalue}
+
+\item{zscoreThr}{numeric indicating the cut-off for covariates coefficients}
 
 \item{plot}{character indicating the layout for plotting. 
 It is one of \code{circular}, \code{landscape} or \code{no}. 

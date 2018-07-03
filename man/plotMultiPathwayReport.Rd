@@ -4,15 +4,17 @@
 \alias{plotMultiPathwayReport}
 \title{Summarize and plot pathways' info from a list of MultiOmicsPathway (MOP)}
 \usage{
-plotMultiPathwayReport(multiPathwayList, top = 25, MOcolors = NULL)
+plotMultiPathwayReport(multiPathwayList, top = 25, MOcolors = NULL, ...)
 }
 \arguments{
 \item{multiPathwayList}{MultiOmicsPathway list pathway object}
 
 \item{top}{use top number of pathways}
 
-\item{MOcolors}{character vector with the omic colors. 
-The colors should be among the color in \code{showMOSpalette()}.}
+\item{MOcolors}{character vector with the omic colors.
+The colors should be among the colors in \code{showMOSpalette()}}
+
+\item{\dots}{additional argument to be passed to pheatmap}
 }
 \description{
 Given the list of MOPs, it plots the table.

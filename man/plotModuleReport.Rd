@@ -4,7 +4,7 @@
 \alias{plotModuleReport}
 \title{Summarize and plot pathways' info from a MultiOmicsModule (MOM) object}
 \usage{
-plotModuleReport(pathwayObj)
+plotModuleReport(pathwayObj, MOcolors = NULL, ...)
 }
 \arguments{
 \item{pathwayObj}{MultiOmicsModule of pathway object}

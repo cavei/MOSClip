@@ -17,7 +17,7 @@
 #' 
 #' @export
 plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
-                            paletteNames=c("r_RdYlBu", "BuGn","Blues"),
+                            paletteNames= c(exp="red", met="green", mut="blue"),
                             h = 9, w=7) {
 
   involved <- guessInvolvementPathway(pathway)
@@ -28,8 +28,32 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
   
   # Create annotation and sort
   annotationFull <- formatAnnotations(involved, sortBy)
+  # annotationPalettes <- list(exp="red", met="green", mut="blue")
+  annotationPalettes <- paletteNames
+  
+  ann_col <- lapply(colnames(annotationFull), function(name) {
+    omic <- sub("(PC[0-9]+|[23]k[123]?|TRUE|FALSE)$","",
+                        name, perl=TRUE, ignore.case=FALSE)
+    if (!omic %in% names(annotationPalettes))
+      stop(paste0(omic, " omic not found in annotationPalettes"))
+    
+    discreteColor <- annotationPalettes[[omic]]
+    values <- sort(unique(annotationFull[, name]))
+    if (length(values)==2) {
+      annot <- as.character(MOSClip:::MOSpaletteSchema[discreteColor, c("smart", "light")])
+      names(annot) <- values
+      
+    } else if (length(table(annotationFull[, name]))==3) {
+      annot <- as.character(MOSClip:::MOSpaletteSchema[discreteColor, c("dark", "smart", "light")])
+      names(annot) <- values
+    } else {
+      stop("I'm puzzled too much values to map")
+    }
+    annot
+  })
+  names(ann_col) <- colnames(annotationFull)
   # generate the heatmaps grobs
-  gts <- lapply(seq_along(involved), generateHeatmapGrobTable, involved=involved, annotationFull=annotationFull, palettes=paletteNames)
+  gts <- lapply(seq_along(involved), generateHeatmapGrobTable, involved=involved, annotationFull=annotationFull, palettes=paletteNames, annotationCol=ann_col, oldFation=FALSE)
   
   hmaps <- lapply(gts, function(x) {
     createHeatmapGrob(x)
@@ -43,10 +67,12 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
                                 list(sampleNamesGrob),
                                 list(legendGrob)),
                         layout_matrix = layout_matrix)
+  
   if(!is.null(fileName)) {
     ggplot2::ggsave(filename = fileName, myplot, height = h, width = w)
   } else {
-    plot(myplot)
+    grid::grid.newpage()
+    grid::grid.draw(myplot)
   }
 }
 
@@ -71,7 +97,7 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
 #' 
 #' @export
 plotPathwayKM <- function(pathway, formula = "Surv(days, status) ~ PC1",
-                          fileName=NULL, paletteNames=c("r_RdYlBu", "BuGn","Blues"),
+                          fileName=NULL, paletteNames = c("r_RdYlBu", "BuGn","Blues"),
                           h = 9, w=7) {
   
   checkmate::assertClass(pathway, "MultiOmicsPathway")
@@ -111,22 +137,50 @@ plotPathwayKM <- function(pathway, formula = "Surv(days, status) ~ PC1",
 #' 
 #' @export
 plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL, fileName=NULL,
-                           paletteNames=c("r_RdYlBu", "BuGn","Blues"),
+                           paletteNames = c("red", "green", "blueShades"),
                            h = 9, w=7) {
-
+  
   moduleGenes <- pathway@modules[[moduleNumber]]
+  
   involved <- guessInvolvement(pathway, moduleNumber = moduleNumber)
   if(length(paletteNames)!=length(involved)) {
     repTimes <- ceiling(length(involved)/length(paletteNames))
     paletteNames <- rep(paletteNames, repTimes)[seq_along(involved)]
   }
-
+  
   # Create annotation and sort
   annotationFull <- formatAnnotations(involved, sortBy)
+  # annotationPalettes <- list(exp="red", met="green", mut="blue")
+  annotationPalettes <- paletteNames
+  
+  ann_col <- lapply(colnames(annotationFull), function(name) {
+    omic <- sub("(PC[0-9]+|[23]k[123]?|TRUE|FALSE)$","",
+                name, perl=TRUE, ignore.case=FALSE)
+    if (!omic %in% names(annotationPalettes))
+      stop(paste0(omic, " omic not found in annotationPalettes"))
+    
+    discreteColor <- annotationPalettes[[omic]]
+    values <- sort(unique(annotationFull[, name]))
+    if (length(values)==2) {
+      annot <- as.character(MOSClip:::MOSpaletteSchema[discreteColor, c("smart", "light")])
+      names(annot) <- values
+      
+    } else if (length(table(annotationFull[, name]))==3) {
+      annot <- as.character(MOSClip:::MOSpaletteSchema[discreteColor, c("dark", "smart", "light")])
+      names(annot) <- values
+    } else {
+      stop("I'm puzzled too much values to map")
+    }
+    annot
+  })
+  names(ann_col) <- colnames(annotationFull)
+  
+  
   # generate the heatmaps grobs
   gts <- lapply(seq_along(involved), generateHeatmapGrobTable, involved=involved,
-                annotationFull=annotationFull, palettes=paletteNames)
-
+                annotationFull=annotationFull, palettes=paletteNames,
+                annotationCol=ann_col, oldFation=FALSE)
+  
   hmaps <- lapply(gts, function(x) {
     createHeatmapGrob(x)
   })
@@ -142,7 +196,8 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL, fileName=NULL,
   if(!is.null(fileName)) {
     ggplot2::ggsave(filename = fileName, myplot, height = h, width = w)
   } else {
-    plot(myplot)
+    grid::grid.newpage()
+    grid::grid.draw(myplot)
   }
 }
 
@@ -251,22 +306,19 @@ plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
 #'
 #' @param multiPathwayList MultiOmicsPathway list pathway object
 #' @param top use top number of pathways
-#' @param MOcolors character vector with the omic colors. 
-#' The colors should be among the color in \code{showMOSpalette()}.
+#' @param MOcolors character vector with the omic colors.
+#' The colors should be among the colors in \code{showMOSpalette()}
+#' @param \dots additional argument to be passed to pheatmap
+#' 
 #'
 #' @return NULL
 #'
 #' @importFrom pheatmap pheatmap
 #' 
 #' @export
-plotMultiPathwayReport <- function(multiPathwayList, top=25, 
-                                   MOcolors=NULL){
+plotMultiPathwayReport <- function(multiPathwayList, top=25, MOcolors=NULL, ...){
   if(!is.list(multiPathwayList))
     stop("multiPathwayList must be a list.")
-  
-  if(is.null(MOcolors)){
-    MOcolors <- names(MOSpalette)[1:length(unique(omics))]
-  }
   
   summary <- multiPathwayReport(multiPathwayList)
   top <- min(top, NROW(summary))
@@ -274,6 +326,10 @@ plotMultiPathwayReport <- function(multiPathwayList, top=25,
   annCol <- sub("(PC[0-9]+|[23]k[123]|TRUE|FALSE)$","",
                   colnames(summary), perl=TRUE,ignore.case=FALSE)
   omics <- annCol[2:length(annCol)]
+  
+  if(is.null(MOcolors)){
+    MOcolors <- names(MOSpalette)[1:length(unique(omics))]
+  }
   
   if(length(MOcolors) != length(unique(omics))){
     stop(paste0("Length of MOcol differs from the number of omics:", unique(omics)))
@@ -287,12 +343,20 @@ plotMultiPathwayReport <- function(multiPathwayList, top=25,
   rownames(ann_columns) <- colnames(summary)
   
   ann_colors <- list(omics = colors)
+  dots = list(...)
+  args <- matchArguments(dots, list(display_numbers = T, color = pvalueShades,
+                                   cluster_rows = F, cluster_cols = F, 
+                                   gaps_col = c(1), fontsize_row=5, fontsize_col = 7,
+                                   annotation_col = ann_columns, annotation_colors = ann_colors,
+                                   border_color="white"))
   
-  pheatmap(summary[seq_len(top),,drop=F], display_numbers = T,
-           color = pvalueShades, cluster_rows = F, cluster_cols = F, 
-           gaps_col = c(1), fontsize_row=5, fontsize_col = 7,
-           annotation_col = ann_columns, annotation_colors = ann_colors,
-           border_color="white")
+  args$mat <- summary[seq_len(top),,drop=F]
+  # pheatmap(mat=summary[seq_len(top),,drop=F], ..., display_numbers = T,
+  #          color = pvalueShades, cluster_rows = F, cluster_cols = F, 
+  #          gaps_col = c(1), fontsize_row=5, fontsize_col = 7,
+  #          annotation_col = ann_columns, annotation_colors = ann_colors,
+  #          border_color="white")
+  do.call(pheatmap, args)
 }
 
 #' Summarize and plot pathways' info from a MultiOmicsModule (MOM) object
@@ -306,12 +370,36 @@ plotMultiPathwayReport <- function(multiPathwayList, top=25,
 #' @importFrom grDevices colorRampPalette
 #' @importFrom RColorBrewer brewer.pal
 #' @export
-plotModuleReport <- function(pathwayObj) {
+plotModuleReport <- function(pathwayObj, MOcolors=NULL, ...) {
   summary <- formatModuleReport(pathwayObj)
-  pheatmap(summary, display_numbers = T,
-           color = colorRampPalette(brewer.pal(n = 7, name = "Blues"))(100),
-           cluster_rows = F,
-           cluster_cols = F,
-           gaps_col = 1)
+  annCol <- sub("(PC[0-9]+|[23]k[123]|TRUE|FALSE)$","",
+                colnames(summary), perl=TRUE,ignore.case=FALSE)
+  omics <- annCol[2:length(annCol)]
+  
+  if(is.null(MOcolors)){
+    MOcolors <- names(MOSpalette)[1:length(unique(omics))]
+  }
+  
+  if(length(MOcolors) != length(unique(omics))){
+    stop(paste0("Length of MOcol differs from the number of omics:", unique(omics)))
+  }
+  names(MOcolors) <- unique(omics)
+  
+  colors <- c(NA, sapply(unique(omics), function(o) MOSpalette[MOcolors[o]]))
+  names(colors) <- unique(annCol)
+  
+  ann_columns <- data.frame(omics = factor(annCol))
+  rownames(ann_columns) <- colnames(summary)
+  
+  ann_colors <- list(omics = colors)
+  dots = list(...)
+  args <- matchArguments(dots, list(display_numbers = T, color = pvalueShades,
+                                    cluster_rows = F, cluster_cols = F, 
+                                    gaps_col = c(1), fontsize_row=5, fontsize_col = 7,
+                                    annotation_col = ann_columns, annotation_colors = ann_colors,
+                                    border_color="white"))
+  
+  args$mat <- summary
+  do.call(pheatmap, args)
 }
 

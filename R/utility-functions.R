@@ -54,3 +54,15 @@ na2false <- function(x) {
   x[is.na(x)] <- FALSE
   x
 }
+
+matchArguments <- function(dots, defaults) {
+  if (length(defaults)==0)
+    return(dots)
+  
+  defaults[names(defaults) %in% names(dots)] <- NULL
+  c(defaults, dots)
+}
+
+guessOmic <- function(covs) {
+  unique(sub("(PC[0-9]+|[23]k[123]?|TRUE|FALSE)$", "", covs, perl=TRUE, ignore.case=FALSE))
+}

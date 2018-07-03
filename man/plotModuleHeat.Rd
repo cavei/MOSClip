@@ -5,7 +5,8 @@
 \title{Plot heatmaps of the module by omics}
 \usage{
 plotModuleHeat(pathway, moduleNumber, sortBy = NULL, fileName = NULL,
-  paletteNames = c("r_RdYlBu", "BuGn", "Blues"), h = 9, w = 7)
+  paletteNames = c("redShades", "greenShades", "blueShades"), h = 9,
+  w = 7)
 }
 \arguments{
 \item{pathway}{MultiOmicsModule pathway object}

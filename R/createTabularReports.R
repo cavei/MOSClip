@@ -58,9 +58,9 @@ formatModuleReport <- function(smObj){
   z  <- smObj@zlists
   idxs <- order(alphas)
 
-  zcols <- unique(unlist(lapply(z, function(x){
+  zcols <- sort(unique(unlist(lapply(z, function(x){
     names(x)
-  })))
+  }))))
 
   colDescription <- do.call(rbind, lapply(idxs, function(i){
     additionalCols <- rep(NA, length(zcols))

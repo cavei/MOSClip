@@ -1,23 +1,37 @@
 #' @importFrom grDevices colorRampPalette
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom pheatmap pheatmap
-generateHeatmapGrobTable <- function(i, involved, annotationFull, palettes, orgDbi="org.Hs.eg.db") {
+generateHeatmapGrobTable <- function(i, involved, annotationFull, palettes, annotationCol=NA, orgDbi="org.Hs.eg.db", oldFation=TRUE) {
   heatMatrix <- involved[[i]]$sigModule
+  omic <- guessOmic(involved[[i]]$covsConsidered)
+  
+  palette=palettes[i]
+  if (!is.null(names(palettes))) {
+    palette = palettes[[omic]]
+  }
+  
+  
   heatMatrix <- heatMatrix[, row.names(annotationFull), drop=F]
   
-  # lbs = row.names(heatMatrix)
-  # if (any(grep("ENTREZID:", row.names(heatMatrix)))){
-  #   lbs <- entrez2symbol(row.names(heatMatrix))
-  # }
   lbs <- conversionToSymbols(row.names(heatMatrix), orgDbi)
   
-  splitted <- unlist(strsplit(palettes[i],"_"))
-  if (length(splitted)==1) {
-    cls <- colorRampPalette(brewer.pal(n = 7, name=splitted))(100)
-  } else if (length(splitted) ==2 & splitted[1] == "r") {
-    cls <- colorRampPalette(rev(brewer.pal(n = 7, name=splitted[2])))(100)
+  if (oldFation) {
+    splitted <- unlist(strsplit(palettes[i],"_"))
+    if (length(splitted)==1) {
+      cls <- colorRampPalette(brewer.pal(n = 7, name=splitted))(100)
+    } else if (length(splitted) ==2 & splitted[1] == "r") {
+      cls <- colorRampPalette(rev(brewer.pal(n = 7, name=splitted[2])))(100)
+    } else {
+      stop("Palette name definition error. See documentation for details")
+    }
   } else {
-    stop("Palette name definition error. See documentation for details")
+    cls <- switch(palette,
+           red = MOSClip:::redShades(100),
+           green = MOSClip:::greenShades(100),
+           blue = MOSClip:::blueShades(100),
+           yellow = MOSClip:::yellowShades(100),
+           violet = MOSClip:::violetShades(100),
+           teal = MOSClip:::tealShades(100))
   }
   
   cluster_rows=T
@@ -32,6 +46,7 @@ generateHeatmapGrobTable <- function(i, involved, annotationFull, palettes, orgD
                      fontsize_col = 4,
                      labels_row=lbs,
                      annotation_col=annotationFull,
+                     annotation_colors = annotationCol,
                      silent=TRUE)$gtable
 }
 
