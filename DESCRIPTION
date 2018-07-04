@@ -8,7 +8,10 @@ Description: Allows to combine multiple omics dimension to perform pathway survi
 Encoding: UTF-8
 LazyData: true
 Depends: 
-Imports: methods, survClip, survminer, clipper, graph, houseOfClipUtility, graphite, AnnotationDbi, checkmate, ggplot2, gridExtra, igraph, pheatmap, survival, RColorBrewer, RCy3, SuperExactTest
+Imports: methods, survClip, survminer, graph, houseOfClipUtility,
+  graphite, AnnotationDbi, checkmate, ggplot2, gridExtra, igraph,
+  pheatmap, survival, RColorBrewer, RCy3, SuperExactTest,
+  reshape
 Remotes: github::cavei/houseOfClipUtility, github::cavei/survClip
 Suggests: RUnit, BiocGenerics, MASS, BiocStyle, org.Hs.eg.db, testthat
 License: AGPL-3

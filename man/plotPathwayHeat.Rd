@@ -5,7 +5,8 @@
 \title{Plot heatmaps of the pathway by omics}
 \usage{
 plotPathwayHeat(pathway, sortBy = NULL, fileName = NULL,
-  paletteNames = c("r_RdYlBu", "BuGn", "Blues"), h = 9, w = 7)
+  paletteNames = c(exp = "red", met = "green", mut = "blue"), h = 9,
+  w = 7)
 }
 \arguments{
 \item{pathway}{MultiOmicsPathway pathway object}

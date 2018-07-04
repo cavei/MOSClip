@@ -26,12 +26,12 @@ generateHeatmapGrobTable <- function(i, involved, annotationFull, palettes, anno
     }
   } else {
     cls <- switch(palette,
-           red = MOSClip:::redShades(100),
-           green = MOSClip:::greenShades(100),
-           blue = MOSClip:::blueShades(100),
-           yellow = MOSClip:::yellowShades(100),
-           violet = MOSClip:::violetShades(100),
-           teal = MOSClip:::tealShades(100))
+           red = redShades(100),
+           green = greenShades(100),
+           blue = blueShades(100),
+           yellow = yellowShades(100),
+           violet = violetShades(100),
+           teal = tealShades(100))
   }
   
   cluster_rows=T

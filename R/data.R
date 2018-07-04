@@ -54,3 +54,5 @@ pvalueShades <- grDevices::colorRampPalette(
   colors=c("#edf7f5", "#2796bd"),
   bias=20, space="rgb",
   interpolate="linear", alpha=FALSE)(100)
+
+omicsRegexp <- "(PC[0-9]+|[23]k[123]?|TRUE|FALSE)$"

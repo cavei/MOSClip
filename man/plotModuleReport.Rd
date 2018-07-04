@@ -8,6 +8,11 @@ plotModuleReport(pathwayObj, MOcolors = NULL, ...)
 }
 \arguments{
 \item{pathwayObj}{MultiOmicsModule of pathway object}
+
+\item{MOcolors}{character vector with the omic colors.
+The colors should be among the colors in \code{showMOSpalette()}}
+
+\item{...}{additional argument to be passed to pheatmap}
 }
 \description{
 Given a MOM, it plots the table.

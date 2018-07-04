@@ -64,5 +64,16 @@ matchArguments <- function(dots, defaults) {
 }
 
 guessOmic <- function(covs) {
-  unique(sub("(PC[0-9]+|[23]k[123]?|TRUE|FALSE)$", "", covs, perl=TRUE, ignore.case=FALSE))
+  unique(sub(omicsRegexp, "", covs, perl=TRUE, ignore.case=FALSE))
+}
+
+guessOmics <- function(covs) {
+  sub(omicsRegexp, "", covs, perl=TRUE, ignore.case=FALSE)
+}
+
+guessOmicsColors <- function(omics) {
+  uomics <- unique(omics)
+  MOcols <- names(MOSpalette)[seq_along(uomics)]
+  names(MOcols) <- uomics
+  MOcols
 }

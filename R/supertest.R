@@ -46,7 +46,7 @@ runSupertest <- function(multiPathwayReportData, pvalueThr=0.05,
   if(!(any("pvalue" %in% colnames(multiPathwayReportData))))
     stop("Data malformed. There is not a overall pvalue column.")
   
-  if(is.null(grep("(PC[0-9]+|[23]k[123]|TRUE|FALSE)$", colnames(multiPathwayReportData))))
+  if(is.null(grep(omicsRegexp, colnames(multiPathwayReportData))))
     stop("Data malformed. There are no columns of with covariates as colnames.")
   
   if((!is.null(excludeColumns)) & (any(!(excludeColumns %in% colnames(multiPathwayReportData)))))
@@ -88,8 +88,8 @@ runSupertest <- function(multiPathwayReportData, pvalueThr=0.05,
   covarColumns <- !(colnames(multiPathwayReportData) %in% "pvalue")
   multiPathwayReportDataSig <- multiPathwayReportDataSig[,covarColumns]
   covars <- colnames(multiPathwayReportDataSig)
-  covars2omics <- sub("(PC[0-9]+|[23]k[123]|TRUE|FALSE)$","",
-                     covars, perl=TRUE,ignore.case=FALSE)
+  covars2omics <- guessOmics(covars)
+  # sub("(PC[0-9]+|[23]k[123]|TRUE|FALSE)$","", covars, perl=TRUE,ignore.case=FALSE)
   
   MOlistPval <- tapply(colnames(multiPathwayReportDataSig),
                        covars2omics, 
@@ -119,20 +119,21 @@ runSupertest <- function(multiPathwayReportData, pvalueThr=0.05,
 #' 
 #' @return a vector of fathers names
 #' 
+#' @importFrom houseOfClipUtility mapPathwaysIDfromGraphite getPathFathers id2name
 #' @importFrom igraph V
 #' @export
 #' 
 annotePathwayToFather <- function(pathways, graphiteDB, hierarchy) {
-  ord = length(igraph::V(pathHierarchyGraph))*2
-  pathway2id <- mapPathwaysIDfromGraphite(graphiteDB) # codici
+  ord = length(igraph::V(hierarchy))*2
+  pathway2id <- houseOfClipUtility::mapPathwaysIDfromGraphite(graphiteDB) # codici
   pathwayDict <- pathway2id$pname
   names(pathwayDict) <- pathway2id$id
   
-  ids <- mapPathwaysIDfromGraphite(graphiteDB, pathways)$id
-  path2fathers <- lapply(ids, getPathFathers, pathHierarchyGraph,
+  ids <- houseOfClipUtility::mapPathwaysIDfromGraphite(graphiteDB, pathways)$id
+  path2fathers <- lapply(ids, houseOfClipUtility::getPathFathers, hierarchy,
                          ord=ord)
   names(path2fathers) <- ids
-  ids2father <- id2name(path2fathers, pathwayDict)
+  ids2father <- houseOfClipUtility::id2name(path2fathers, pathwayDict)
   # data.frame(pathways, fathers=unlist(ids2father), stringsAsFactors = FALSE)
   unlist(ids2father)
 }
@@ -151,7 +152,7 @@ computeOmicsIntersections <- function(multiPathwayReportData, pvalueThr=0.05,
   if(!(any("pvalue" %in% colnames(multiPathwayReportData))))
     stop("Data malformed. There is not a overall pvalue column.")
   
-  if(is.null(grep("(PC[0-9]+|[23]k[123]|TRUE|FALSE)$", colnames(multiPathwayReportData))))
+  if(is.null(grep(omicsRegexp, colnames(multiPathwayReportData))))
     stop("Data malformed. There are no columns of with covariates as colnames.")
   
   if((!is.null(excludeColumns)) & (any(!(excludeColumns %in% colnames(multiPathwayReportData)))))
@@ -185,8 +186,8 @@ computeOmicsIntersections <- function(multiPathwayReportData, pvalueThr=0.05,
   covarColumns <- !(colnames(multiPathwayReportData) %in% "pvalue")
   multiPathwayReportDataSig <- multiPathwayReportDataSig[,covarColumns]
   covars <- colnames(multiPathwayReportDataSig)
-  covars2omics <- sub("(PC[0-9]+|[23]k[123]|TRUE|FALSE)$","",
-                      covars, perl=TRUE,ignore.case=FALSE)
+  covars2omics <- guessOmics(covars)
+  # sub("(PC[0-9]+|[23]k[123]|TRUE|FALSE)$","", covars, perl=TRUE,ignore.case=FALSE)
   
   MOlistPval <- tapply(colnames(multiPathwayReportDataSig),
                        covars2omics, 
