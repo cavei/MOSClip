@@ -19,9 +19,9 @@ checkOrder <- function(li) {
 #' @rdname resampling
 #' 
 resolveAndOrder <- function(li) {
-  ref <- li[[1]]$pathwayModule
+  ref <- row.names(li[[1]])
   for (i in seq_along(li)){
-    ref <- intersect(li[[i]]$pathwayModule,ref)
+    ref <- intersect(row.names(li[[i]]),ref)
   }
   lapply(li, function(o) {o[order(ref),]})
 }

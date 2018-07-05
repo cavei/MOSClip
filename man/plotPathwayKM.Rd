@@ -5,8 +5,7 @@
 \title{Plot KM of the pathway by omics}
 \usage{
 plotPathwayKM(pathway, formula = "Surv(days, status) ~ PC1",
-  fileName = NULL, paletteNames = c("r_RdYlBu", "BuGn", "Blues"), h = 9,
-  w = 7)
+  fileName = NULL, paletteNames = NULL, h = 9, w = 7)
 }
 \arguments{
 \item{pathway}{MultiOmicsModule pathway object}

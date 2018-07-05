@@ -5,7 +5,7 @@
 \title{Plot graph of the module by omics}
 \usage{
 plotModuleInGraph(pathway, moduleNumber, orgDbi = "org.Hs.eg.db",
-  makeLegend = NULL, fileName = NULL)
+  paletteNames = NULL, makeLegend = NULL, fileName = NULL)
 }
 \arguments{
 \item{pathway}{MultiOmicsModule pathway object}
@@ -13,6 +13,8 @@ plotModuleInGraph(pathway, moduleNumber, orgDbi = "org.Hs.eg.db",
 \item{moduleNumber}{a module number}
 
 \item{orgDbi}{if needed, a organism Dbi to translate vectors}
+
+\item{paletteNames}{named vector of MOpalettes, names replace makeLegend arguments}
 
 \item{makeLegend}{set up your favourite names for the omics}
 

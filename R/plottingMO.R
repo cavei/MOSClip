@@ -123,7 +123,7 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
 #' 
 #' @export
 plotPathwayKM <- function(pathway, formula = "Surv(days, status) ~ PC1",
-                          fileName=NULL, paletteNames = c("r_RdYlBu", "BuGn","Blues"),
+                          fileName=NULL, paletteNames = NULL,
                           h = 9, w=7) {
   
   checkmate::assertClass(pathway, "MultiOmicsPathway")
@@ -134,7 +134,19 @@ plotPathwayKM <- function(pathway, formula = "Surv(days, status) ~ PC1",
   coxObj <- data.frame(daysAndStatus, annotationFull[row.names(daysAndStatus), , drop=F])
   
   fit <- survminer::surv_fit(formula(formula), data = coxObj)
-  p <- survminer::ggsurvplot(fit, data = coxObj, risk.table = TRUE, pval=T)
+  
+  palette=NULL
+  if (!is.null(paletteNames)) {
+    if (length(paletteNames)==1) {
+      palette=paletteNames
+    } else {
+    classes <- names(fit$strata)
+    if (length(classes)==length(paletteNames))
+      palette = paletteNames
+    }
+  }
+  
+  p <- survminer::ggsurvplot(fit, data = coxObj, risk.table = TRUE, pval=T, palette=palette)
   
   if(!is.null(fileName)) {
     ggplot2::ggsave(filename = fileName, p, height = h, width = w)
@@ -271,7 +283,7 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL,
 #' 
 #' @export
 plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ PC1",
-                         fileName=NULL, paletteNames=c("r_RdYlBu", "BuGn","Blues"),
+                         fileName=NULL, paletteNames=NULL,
                          h = 9, w=7) {
   involved <- guessInvolvement(pathway, moduleNumber = moduleNumber)
 
@@ -281,7 +293,19 @@ plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ 
   coxObj <- data.frame(daysAndStatus, annotationFull[row.names(daysAndStatus), , drop=F])
 
   fit <- survminer::surv_fit(formula(formula), data = coxObj)
-  p <- survminer::ggsurvplot(fit, data = coxObj, risk.table = TRUE, pval=T)
+  
+  palette=NULL
+  if (!is.null(paletteNames)) {
+    if (length(paletteNames)==1) {
+      palette=paletteNames
+    } else {
+      classes <- names(fit$strata)
+      if (length(classes)==length(paletteNames))
+        palette = paletteNames
+    }
+  }
+  
+  p <- survminer::ggsurvplot(fit, data = coxObj, risk.table = TRUE, pval=T, palette=palette)
 
   if(!is.null(fileName)) {
     ggplot2::ggsave(filename = fileName, p, height = h, width = w)
@@ -298,6 +322,7 @@ plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ 
 #' @param moduleNumber a module number
 #' @param orgDbi if needed, a organism Dbi to translate vectors
 #' @param makeLegend set up your favourite names for the omics
+#' @param paletteNames named vector of MOpalettes, names replace makeLegend arguments
 #' @param fileName optional filenames to save the plot
 #'
 #' @return NULL
@@ -309,7 +334,7 @@ plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ 
 #' 
 #' @export
 plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
-                              makeLegend=NULL, fileName=NULL) {
+                              paletteNames=NULL, makeLegend=NULL, fileName=NULL) {
   if (is.null(makeLegend))
     makeLegend <- c(paste("omic",seq_len(length(pathway@modulesView[[moduleNumber]]))))
   
@@ -322,6 +347,7 @@ plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
   mark.groups=lapply(involved, function(x) {
     row.names(x$subset)
   })
+  
   colLength <- length(mark.groups)
   if (colLength<3) {
     mark.col=rainbow(3, alpha=0.33)[seq_len(colLength)]
@@ -329,6 +355,17 @@ plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
     mark.col=rainbow(colLength, alpha=0.33)
   }
   mark.border=NA
+  
+  if (!is.null(paletteNames)) {
+    if (is.null(names(paletteNames)))
+      stop("paletteNames must be named vector")
+    makeLegend <- names(paletteNames)
+    err <- setdiff(paletteNames, row.names(MOSpaletteSchema))
+    if (length(err)!=0)
+      stop(paste0(err, " paletteNames value is not allowed."))
+    
+    mark.col <- MOSpaletteSchema[paletteNames, ]$transparent
+  }
   
   labels <- conversionToSymbols(names(V(net)), orgDbi)
   
