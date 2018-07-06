@@ -5,8 +5,8 @@
 \title{Plot heatmaps of the pathway by omics}
 \usage{
 plotPathwayHeat(pathway, sortBy = NULL, fileName = NULL,
-  paletteNames = c(exp = "red", met = "green", mut = "blue"), h = 9,
-  w = 7)
+  paletteNames = NULL, additionalAnnotations = NULL,
+  additionalPaletteNames = NULL, h = 9, w = 7)
 }
 \arguments{
 \item{pathway}{MultiOmicsPathway pathway object}
@@ -16,6 +16,10 @@ plotPathwayHeat(pathway, sortBy = NULL, fileName = NULL,
 \item{fileName}{optional filenames to save the plot}
 
 \item{paletteNames}{three palettes}
+
+\item{additionalAnnotations}{optional additional sample annotations}
+
+\item{additionalPaletteNames}{optional additional colors for annotations}
 
 \item{h}{the height of the plot}
 

@@ -6,10 +6,14 @@
 #' @param sortBy a covariate to sort by
 #' @param fileName optional filenames to save the plot
 #' @param paletteNames three palettes
+#' @param additionalAnnotations optional additional sample annotations
+#' @param additionalPaletteNames optional additional colors for annotations
 #' @param h the height of the plot
 #' @param w the width of the plot
 #'
 #' @return NULL
+#' 
+#' @importFrom checkmate assertClass
 #' @importFrom pheatmap pheatmap
 #' @importFrom gridExtra arrangeGrob
 #' @importFrom ggplot2 ggsave
@@ -18,9 +22,12 @@
 #' 
 #' @export
 plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
-                            paletteNames= c(exp="red", met="green", mut="blue"),
+                            paletteNames=NULL,
+                            additionalAnnotations=NULL, additionalPaletteNames=NULL,
                             h = 9, w=7) {
-
+  
+  checkmate::assertClass(pathway, "MultiOmicsPathway")
+  
   involved <- guessInvolvementPathway(pathway)
   if(length(paletteNames)!=length(involved)) {
     repTimes <- ceiling(length(involved)/length(paletteNames))
@@ -76,6 +83,32 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
     annot
   })
   names(ann_col) <- colnames(annotationFull)
+  
+  if (!is.null(additionalAnnotations)) {
+    additionalAnnotations <- matchAnnotations(annotationFull, additionalAnnotations)
+    annotationFull <- cbind(annotationFull, additionalAnnotations)
+    
+    if (!is.null(additionalPaletteNames)) {
+      add_ann_col <- lapply(colnames(additionalAnnotations), function(name) {
+        values <- sort(unique(additionalAnnotations[[name]]))
+        discreteColor <- additionalPaletteNames[[name]]
+        
+        if (length(values)==2) {
+          annot <- as.character(MOSpaletteSchema[discreteColor, c("smart", "light")])
+          names(annot) <- values
+        } else if (length(table(annotationFull[, name]))==3) {
+          annot <- as.character(MOSpaletteSchema[discreteColor, c("dark", "smart", "light")])
+          names(annot) <- values
+        } else {
+          getContinousPalette(discreteColor, length(values))
+        }
+        annot
+      })
+      names(add_ann_col) <- colnames(additionalAnnotations)
+      ann_col=c(ann_col, add_ann_col)
+    }
+  }
+  
   # generate the heatmaps grobs
   gts <- lapply(seq_along(involved), generateHeatmapGrobTable, involved=involved,
                 annotationFull=annotationFull, palettes=paletteNames,
@@ -164,10 +197,13 @@ plotPathwayKM <- function(pathway, formula = "Surv(days, status) ~ PC1",
 #' @param sortBy a covariate to sort by
 #' @param fileName optional filenames to save the plot
 #' @param paletteNames three palettes
+#' @param additionalAnnotations optional additional sample annotations
+#' @param additionalPaletteNames optional additional colors for annotations
 #' @param h the height of the plot
 #' @param w the width of the plot
 #'
 #' @return NULL
+#' @importFrom checkmate assertClass
 #' @importFrom pheatmap pheatmap
 #' @importFrom gridExtra arrangeGrob
 #' @importFrom ggplot2 ggsave
@@ -177,7 +213,10 @@ plotPathwayKM <- function(pathway, formula = "Surv(days, status) ~ PC1",
 #' @export
 plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL,
                            fileName=NULL, paletteNames = NULL,
+                           additionalAnnotations=NULL, additionalPaletteNames=NULL,
                            h = 9, w=7) {
+  
+  checkmate::assertClass(pathway, "MultiOmicsModules")
   
   moduleGenes <- pathway@modules[[moduleNumber]]
   
@@ -197,8 +236,6 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL,
     }
   }
   
-  # annotationPalettes <- list(exp="red", met="green", mut="blue")
-  
   omics <- guessOmics(colnames(annotationFull))
   if(is.null(paletteNames)){
     paletteNames <- names(paletteNames)[1:length(unique(omics))]
@@ -216,7 +253,6 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL,
   
   ann_col <- lapply(colnames(annotationFull), function(name) {
     omic <- guessOmic(name)
-    # sub("(PC[0-9]+|[23]k[123]?|TRUE|FALSE)$","", name, perl=TRUE, ignore.case=FALSE)
     if (!omic %in% names(annotationPalettes))
       stop(paste0(omic, " omic not found in annotationPalettes"))
     
@@ -235,6 +271,31 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL,
     annot
   })
   names(ann_col) <- colnames(annotationFull)
+  
+  if (!is.null(additionalAnnotations)) {
+    additionalAnnotations <- matchAnnotations(annotationFull, additionalAnnotations)
+    annotationFull <- cbind(annotationFull, additionalAnnotations)
+    
+    if (!is.null(additionalPaletteNames)) {
+      add_ann_col <- lapply(colnames(additionalAnnotations), function(name) {
+        values <- sort(unique(additionalAnnotations[[name]]))
+        discreteColor <- additionalPaletteNames[[name]]
+        
+        if (length(values)==2) {
+          annot <- as.character(MOSpaletteSchema[discreteColor, c("smart", "light")])
+          names(annot) <- values
+        } else if (length(table(annotationFull[, name]))==3) {
+          annot <- as.character(MOSpaletteSchema[discreteColor, c("dark", "smart", "light")])
+          names(annot) <- values
+        } else {
+          getContinousPalette(discreteColor, length(values))
+        }
+        annot
+      })
+      names(add_ann_col) <- colnames(additionalAnnotations)
+      ann_col=c(ann_col, add_ann_col)
+    }
+  }
   
   # generate the heatmaps grobs
   gts <- lapply(seq_along(involved), generateHeatmapGrobTable, involved=involved,
@@ -285,6 +346,9 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL,
 plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ PC1",
                          fileName=NULL, paletteNames=NULL,
                          h = 9, w=7) {
+  
+  checkmate::assertClass(pathway, "MultiOmicsModules")
+  
   involved <- guessInvolvement(pathway, moduleNumber = moduleNumber)
 
   annotationFull <- formatAnnotations(involved, sortBy=NULL)
@@ -302,10 +366,15 @@ plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ 
       classes <- names(fit$strata)
       if (length(classes)==length(paletteNames))
         palette = paletteNames
+      if (!is.null(names(paletteNames))) {
+        diff = setdiff(names(paletteNames), classes)
+        if (length(diff)!=0)
+          stop("names of paletteNames must be equal to classes")
+      }
     }
   }
   
-  p <- survminer::ggsurvplot(fit, data = coxObj, risk.table = TRUE, pval=T, palette=palette)
+  p <- survminer::ggsurvplot(fit, data = coxObj, risk.table = TRUE, pval=T, palette=unname(palette))
 
   if(!is.null(fileName)) {
     ggplot2::ggsave(filename = fileName, p, height = h, width = w)
@@ -326,7 +395,7 @@ plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ 
 #' @param fileName optional filenames to save the plot
 #'
 #' @return NULL
-#' 
+#' @importFrom checkmate assertClass
 #' @importFrom igraph V V<- simplify igraph.from.graphNEL
 #' @importFrom AnnotationDbi select
 #' @importFrom graphics plot legend
@@ -335,6 +404,8 @@ plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ 
 #' @export
 plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
                               paletteNames=NULL, makeLegend=NULL, fileName=NULL) {
+  
+  checkmate::assertClass(pathway, "MultiOmicsModules")
   if (is.null(makeLegend))
     makeLegend <- c(paste("omic",seq_len(length(pathway@modulesView[[moduleNumber]]))))
   
@@ -451,11 +522,15 @@ plotMultiPathwayReport <- function(multiPathwayList, top=25, MOcolors=NULL, ...)
 #' 
 #'
 #' @return NULL
+#' @importFrom checkmate assertClass
 #' @importFrom pheatmap pheatmap
 #' @importFrom grDevices colorRampPalette
 #' @importFrom RColorBrewer brewer.pal
 #' @export
 plotModuleReport <- function(pathwayObj, MOcolors=NULL, ...) {
+  
+  checkmate::assertClass(pathwayObj, "MultiOmicsModules")
+  
   summary <- formatModuleReport(pathwayObj)
   annCol <- guessOmics(colnames(summary))
   # sub("(PC[0-9]+|[23]k[123]|TRUE|FALSE)$","", colnames(summary), perl=TRUE,ignore.case=FALSE)

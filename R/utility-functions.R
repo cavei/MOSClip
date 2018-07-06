@@ -77,3 +77,25 @@ guessOmicsColors <- function(omics) {
   names(MOcols) <- uomics
   MOcols
 }
+
+matchAnnotations <- function(d1, d2){
+  if (nrow(d1)!=nrow(d2))
+    stop("Annotations have different row numbers")
+  
+  diff <- setdiff(row.names(d2), row.names(d1))
+  if (length(diff) != 0)
+    stop(paste0("We found that samples", paste(diff, collapse = ", "), "do not match MOM annotation"))
+  
+  d2 <- d2[row.names(d1), , drop=F]
+  d2
+}
+
+getContinousPalette <- function(palette, n) {
+  switch(palette,
+         red = redShades(100),
+         green = greenShades(100),
+         blue = blueShades(100),
+         yellow = yellowShades(100),
+         violet = violetShades(100),
+         teal = tealShades(100))
+}
