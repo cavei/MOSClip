@@ -406,9 +406,7 @@ plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
                               paletteNames=NULL, makeLegend=NULL, fileName=NULL) {
   
   checkmate::assertClass(pathway, "MultiOmicsModules")
-  if (is.null(makeLegend))
-    makeLegend <- c(paste("omic",seq_len(length(pathway@modulesView[[moduleNumber]]))))
-  
+
   net <- igraph.from.graphNEL(pathway@graphNEL)
   moduleGenes <- pathway@modules[[moduleNumber]]
   net <- igraph::simplify(net, remove.multiple = T, remove.loops = T)
@@ -418,6 +416,15 @@ plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
   mark.groups=lapply(involved, function(x) {
     row.names(x$subset)
   })
+  
+  group.names <- sapply(involved, function(x) {
+    guessOmic(x$covsConsidered)
+  })
+  
+  if (is.null(makeLegend)) {
+    # makeLegend <- c(paste("omic",seq_len(length(pathway@modulesView[[moduleNumber]]))))
+    makeLegend <- group.names
+  }
   
   colLength <- length(mark.groups)
   if (colLength<3) {
