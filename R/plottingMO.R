@@ -100,7 +100,8 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
           annot <- as.character(MOSpaletteSchema[discreteColor, c("dark", "smart", "light")])
           names(annot) <- values
         } else {
-          getContinousPalette(discreteColor, length(values))
+          annot <- getContinousPalette(discreteColor, length(values))
+          names(annot) <- levels(values)
         }
         annot
       })
@@ -288,7 +289,8 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL,
           annot <- as.character(MOSpaletteSchema[discreteColor, c("dark", "smart", "light")])
           names(annot) <- values
         } else {
-          getContinousPalette(discreteColor, length(values))
+          annot <- getContinousPalette(discreteColor, length(values))
+          names(annot) <- levels(values)
         }
         annot
       })
@@ -390,7 +392,7 @@ plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ 
 #' @param pathway MultiOmicsModule pathway object
 #' @param moduleNumber a module number
 #' @param orgDbi if needed, a organism Dbi to translate vectors
-#' @param makeLegend set up your favourite names for the omics
+#' @param legendLabels set up your favourite names for the omics
 #' @param paletteNames named vector of MOpalettes, names replace makeLegend arguments
 #' @param fileName optional filenames to save the plot
 #'
@@ -403,7 +405,7 @@ plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ 
 #' 
 #' @export
 plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
-                              paletteNames=NULL, makeLegend=NULL, fileName=NULL) {
+                              paletteNames=NULL, legendLabels=NULL, fileName=NULL) {
   
   checkmate::assertClass(pathway, "MultiOmicsModules")
 
@@ -421,11 +423,6 @@ plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
     guessOmic(x$covsConsidered)
   })
   
-  if (is.null(makeLegend)) {
-    # makeLegend <- c(paste("omic",seq_len(length(pathway@modulesView[[moduleNumber]]))))
-    makeLegend <- group.names
-  }
-  
   colLength <- length(mark.groups)
   if (colLength<3) {
     mark.col=rainbow(3, alpha=0.33)[seq_len(colLength)]
@@ -435,14 +432,31 @@ plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
   mark.border=NA
   
   if (!is.null(paletteNames)) {
-    if (is.null(names(paletteNames)))
-      stop("paletteNames must be named vector")
-    makeLegend <- names(paletteNames)
+    # if (is.null(names(paletteNames)))
+    #   stop("paletteNames must be named vector")
+    
+    if (!is.null(names(paletteNames))) {
+      mismatch <- setdiff(group.names, names(paletteNames))
+      if (length(mismatch)>0)
+        stop(paste0("Missing palet for omics:" , paste(mismatch, collapse = ", ")))
+      paletteNames <- paletteNames[group.names]
+    }
+    
+    # legendLabels <- names(paletteNames)
     err <- setdiff(paletteNames, row.names(MOSpaletteSchema))
     if (length(err)!=0)
       stop(paste0(err, " paletteNames value is not allowed."))
     
     mark.col <- MOSpaletteSchema[paletteNames, ]$transparent
+  }
+  
+  if (is.null(legendLabels)) {
+    # legendLabels <- c(paste("omic",seq_len(length(pathway@modulesView[[moduleNumber]]))))
+    legendLabels <- group.names
+  } else {
+    if (length(legendLabels)!=length(group.names))
+      warning("Your legendLabels are more than those found")
+    legendLabels <- legendLabels[seq_along(group.names)]
   }
   
   labels <- conversionToSymbols(names(V(net)), orgDbi)
@@ -456,7 +470,7 @@ plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
        vertex.label.color="black", vertex.size=15,
        mark.groups=mark.groups, mark.col=mark.col, mark.border=NA
        )
-  legend(x=-1, y=-1, makeLegend, pch=21, horiz=TRUE,
+  legend(x=-1, y=-1, legendLabels, pch=21, horiz=TRUE,
          col="#777777", pt.bg=mark.col, pt.cex=2, cex=.8, bty="n", ncol=1)
   if (!is.null(fileName)) {
     dev.off()
