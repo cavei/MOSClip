@@ -36,9 +36,20 @@ formatAnnotations <- function(listOfMostlyInvolvedGenesInOmics, sortBy) {
   if (is.null(sortBy)) {
     annotationFull <- annotationFull[order(annotationFull[, 1], annotationFull[, ncol(annotationFull)]), , drop=F]
   } else {
-    annotationFull <- annotationFull[order(annotationFull[, sortBy]), , drop=F]
+    ord <- getMultiColOrder(annotationFull, sortBy)
+    annotationFull <- annotationFull[ord, , drop=F]
   }
   annotationFull
+}
+
+getMultiColOrder <- function(df, sortBy) {
+  if (!is.data.frame(df))
+    stop("df must be a data frame.")
+  
+  columns <- paste0("df$", sortBy)
+  columns <- paste(columns, collapse = ", ")
+  exp <- paste0("order(", columns, ")")
+  eval(parse(text=exp))
 }
 
 extractPvalues <- function(x) {
