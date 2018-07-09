@@ -14,6 +14,28 @@ check_Omics <- function(object) {
     msg <- paste(paste(object@methods[match], collapse=", "), "methods not found. Try availableOmicMethods.")
     return(msg)
   }
+  
+  samplesNumber <- sapply(object@data, ncol)
+  if (length(unique(samplesNumber))!=1)
+    return("Mismatch in sample numbers")
+  
+  samples <- lapply(object@data, colnames)
+  if (length(samples) > 1) {
+    ref <- samples[[1]]
+    cmps <- sapply(seq(from=2, to=length(samples)), function(i) {
+      identical(ref, samples[[i]])
+    })
+  }
+  if (!all(cmps))
+    return("Samples order mismatch")
+  
+  duplo <- sapply(object@data, function(data) {
+    any(duplicated(row.names(data)))
+  })
+  if (any(duplo)) {
+    return(paste0("Duplicated row.names found in omics ", paste(which(duplo), collapse = ", ")))
+  }
+  
   return(TRUE)
 }
 
