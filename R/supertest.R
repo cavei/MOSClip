@@ -17,7 +17,9 @@
 #' @param excludeColumns a vector of characters listing the columns of 
 #' \code{multiPathwayReportData} object to be excluded by the analysis. 
 #' In the case \code{multiPathwayReportData} derives from \code{\link{multiPathwayModuleReport}} 
-#' you should set \code{excludeColumns = c("pathway","module")}. 
+#' you should set \code{excludeColumns = c("pathway","module")}.
+#' @param color.on color that represent the active omics in the sector
+#' @param color.off color that represent the omics mnot considered in the sector
 #'
 #' @details This function calculates intersection sizes between multiple set of pathways or modules 
 #' and performs statistical test of the intersections using the total amout of 
@@ -41,7 +43,8 @@ runSupertest <- function(multiPathwayReportData, pvalueThr=0.05,
                          zscoreThr=0.05,
                          plot=c('circular','landscape','noplot'), 
                          sort.by=c('set','size','degree','p-value'),
-                         excludeColumns=NULL){
+                         excludeColumns=NULL,
+                         color.on = "#f6bb42", color.off = "#D3D3D3"){
   
   if(!(any("pvalue" %in% colnames(multiPathwayReportData))))
     stop("Data malformed. There is not a overall pvalue column.")
@@ -103,8 +106,8 @@ runSupertest <- function(multiPathwayReportData, pvalueThr=0.05,
   
   if(plot != "noplot"){
     plot(msetSupertest,
-         color.on = c("#409ec3"), color.off = "white",
-         heatmapColor = grDevices::colorRampPalette(RColorBrewer::brewer.pal(9,"OrRd"))(100),
+         color.on = color.on, color.off = color.off,
+         heatmapColor = rev(pvalueShades),
          sort.by = sort.by, Layout = plot)
   }
   

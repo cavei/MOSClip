@@ -6,7 +6,8 @@
 \usage{
 runSupertest(multiPathwayReportData, pvalueThr = 0.05, zscoreThr = 0.05,
   plot = c("circular", "landscape", "noplot"), sort.by = c("set", "size",
-  "degree", "p-value"), excludeColumns = NULL)
+  "degree", "p-value"), excludeColumns = NULL, color.on = "#f6bb42",
+  color.off = "#D3D3D3")
 }
 \arguments{
 \item{multiPathwayReportData}{data.frame, the output of 
@@ -29,6 +30,10 @@ and "p-value".}
 \code{multiPathwayReportData} object to be excluded by the analysis. 
 In the case \code{multiPathwayReportData} derives from \code{\link{multiPathwayModuleReport}} 
 you should set \code{excludeColumns = c("pathway","module")}.}
+
+\item{color.on}{color that represent the active omics in the sector}
+
+\item{color.off}{color that represent the omics mnot considered in the sector}
 }
 \value{
 a data.frame containing all the numeric information of the plot included
