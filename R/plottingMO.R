@@ -35,7 +35,7 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
   }
   
   # Create annotation and sort
-  annotationFull <- formatAnnotations(involved, sortBy)
+  annotationFull <- formatAnnotations(involved, sortBy=NULL)
   idx <- which(unlist(lapply(annotationFull, class))=="numeric")
   if (length(idx)>0) {
     for (i in idx) {
@@ -109,7 +109,7 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
       ann_col=c(ann_col, add_ann_col)
     }
   }
-  
+  annotationFull <- sortAnnotations(annotationFull, sortBy)
   # generate the heatmaps grobs
   gts <- lapply(seq_along(involved), generateHeatmapGrobTable, involved=involved,
                 annotationFull=annotationFull, palettes=paletteNames,
@@ -187,6 +187,7 @@ plotPathwayKM <- function(pathway, formula = "Surv(days, status) ~ PC1",
   } else {
     p
   }
+  # invisible(list(fit=fit, coxObj=coxObj))
 }
 
 #' Plot heatmaps of the module by omics
@@ -229,7 +230,7 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL,
   }
 
     # Create annotation and sort
-  annotationFull <- formatAnnotations(involved, sortBy)
+  annotationFull <- formatAnnotations(involved, sortBy=NULL)
   idx <- which(unlist(lapply(annotationFull, class))=="numeric")
   if (length(idx)>0) {
     for (i in idx) {
@@ -299,6 +300,7 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL,
     }
   }
   
+  annotationFull <- sortAnnotations(annotationFull, sortBy)
   # generate the heatmaps grobs
   gts <- lapply(seq_along(involved), generateHeatmapGrobTable, involved=involved,
                 annotationFull=annotationFull, palettes=paletteNames,

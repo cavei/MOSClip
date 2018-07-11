@@ -42,6 +42,15 @@ formatAnnotations <- function(listOfMostlyInvolvedGenesInOmics, sortBy) {
   annotationFull
 }
 
+sortAnnotations <- function(annotations, sortBy) {
+  missing <- setdiff(sortBy, colnames(annotations))
+  if (length(missing)!=0)
+    stop(paste0(paste(missing, collapse = ", "), ": covariates not found"))
+  
+  ord <- getMultiColOrder(annotations, sortBy)
+  annotations[ord, , drop=F]
+}
+
 getMultiColOrder <- function(df, sortBy) {
   if (!is.data.frame(df))
     stop("df must be a data frame.")
