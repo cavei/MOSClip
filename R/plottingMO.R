@@ -17,6 +17,7 @@
 #' @importFrom pheatmap pheatmap
 #' @importFrom gridExtra arrangeGrob
 #' @importFrom ggplot2 ggsave
+#' @importFrom grid grid.newpage grid.draw
 #' @importFrom graphics plot
 #' @importFrom stats relevel
 #' 
@@ -208,6 +209,7 @@ plotPathwayKM <- function(pathway, formula = "Surv(days, status) ~ PC1",
 #' @importFrom checkmate assertClass
 #' @importFrom pheatmap pheatmap
 #' @importFrom gridExtra arrangeGrob
+#' @importFrom grid grid.newpage grid.draw
 #' @importFrom ggplot2 ggsave
 #' @importFrom graphics plot
 #' @importFrom stats relevel
