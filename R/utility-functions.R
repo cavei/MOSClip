@@ -112,10 +112,10 @@ matchAnnotations <- function(d1, d2){
 
 getContinousPalette <- function(palette, n) {
   switch(palette,
-         red = redShades(100),
-         green = greenShades(100),
-         blue = blueShades(100),
-         yellow = yellowShades(100),
-         violet = violetShades(100),
-         teal = tealShades(100))
+         red = redShades(n),
+         green = greenShades(n),
+         blue = blueShades(n),
+         yellow = yellowShades(n),
+         violet = violetShades(n),
+         teal = tealShades(n))
 }

@@ -102,7 +102,7 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
           names(annot) <- values
         } else {
           annot <- getContinousPalette(discreteColor, length(values))
-          names(annot) <- levels(values)
+          # names(annot) <- levels(values)
         }
         annot
       })

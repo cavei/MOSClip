@@ -26,8 +26,6 @@ resolveAndOrder <- function(li) {
   lapply(li, function(o) {o[order(ref),]})
 }
 
-# checkOrder(exprsPerms)
-
 #' Merge given column from a list of summaries
 #' 
 #' For internal use only
@@ -110,10 +108,10 @@ filterMultiOmicsForSamples <- function(MO, samples) {
 #' 
 #' @export
 #' 
-resampling <- function(fullMultiOmics, survAnnot, pathdb, nperm=100, pathwaySubset=NULL) {
+resampling <- function(fullMultiOmics, survAnnot, pathdb, nperm=100, pathwaySubset=NULL, nPatients=3) {
   set.seed(1234)
   patients <- row.names(survAnnot)
-  patientsPerms <- lapply(seq_len(nperm), function(x) sample(patients, length(patients)-3))
+  patientsPerms <- lapply(seq_len(nperm), function(x) sample(patients, length(patients)-nPatients))
   
   genesToConsider <- row.names(fullMultiOmics@data[[1]])
   rePathSmall <- pathdb
@@ -125,7 +123,6 @@ resampling <- function(fullMultiOmics, survAnnot, pathdb, nperm=100, pathwaySubs
     pts <- patientsPerms[[boot]]
     sAnn <- survAnnot[pts, ]
     multiOmics <- filterMultiOmicsForSamples(fullMultiOmics, pts)
-    
     
     multiOmicsReactome <- lapply(rePathSmall, function(g) {
       # print(g@title)
