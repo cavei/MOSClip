@@ -46,24 +46,11 @@ runSupertest <- function(multiPathwayReportData, pvalueThr=0.05,
                          excludeColumns=NULL,
                          color.on = "#f6bb42", color.off = "#D3D3D3"){
   
-  if(!(any("pvalue" %in% colnames(multiPathwayReportData))))
-    stop("Data malformed. There is not a overall pvalue column.")
+  checkReportFormat(multiPathwayReportData)
+  checkColumnsExclusion(multiPathwayReportData, excludeColumns)
   
-  if(is.null(grep(omicsRegexp, colnames(multiPathwayReportData))))
-    stop("Data malformed. There are no columns of with covariates as colnames.")
-  
-  if((!is.null(excludeColumns)) & (any(!(excludeColumns %in% colnames(multiPathwayReportData)))))
-    stop("Data malformed. Not all the colnames in excludeColumns are in the data.")
-  
-  if(!is.null(excludeColumns)){
-    if(c("pvalue") %in% excludeColumns) {
-    stop("You can not exclude the overall pvalue column, it is a required column.")
-    }}
-  
-  if(!is.numeric(pvalueThr))
-    stop("pvalueThr should be numeric.")
-    else if((pvalueThr > 1) | (pvalueThr < 0))
-      stop("pvalueThr should be a number included between 0 and 1.")
+  checkPvalueThresholdFormat(pvalueThr, "pvalueThr")
+  checkPvalueThresholdFormat(zscoreThr, "zscoreThr")
   
   plot <- plot[1]
   if(!(plot %in% c('circular','landscape','noplot')))
@@ -73,31 +60,10 @@ runSupertest <- function(multiPathwayReportData, pvalueThr=0.05,
   if(plot != "noplot" & (!(sort.by %in% c('set','size','degree','p-value'))))
     stop("sort.by argument should be one of set, size, degree or p-value.")
   
-  columnsNotExcluded <- colnames(multiPathwayReportData)[!(colnames(multiPathwayReportData) %in% excludeColumns)]
-  multiPathwayReportData <- multiPathwayReportData[,columnsNotExcluded]
-  
-  colClasses <- sapply(multiPathwayReportData, class)
-  if(unique(colClasses) != "numeric"){
-    notNumericColumns <- colnames(multiPathwayReportData)[colClasses != "numeric"]
-    stop(paste0("Data malformed.", 
-                "The following columns are not numeric. 
-                You should consider the use of excludeColumns argument: ", 
-                paste(notNumericColumns, collapse = ", ")))
-  }
-  
   universeSize <- NROW(multiPathwayReportData)
   multiPathwayReportDataSig <- multiPathwayReportData[multiPathwayReportData[,"pvalue"] <= pvalueThr,]
   
-  covarColumns <- !(colnames(multiPathwayReportData) %in% "pvalue")
-  multiPathwayReportDataSig <- multiPathwayReportDataSig[,covarColumns]
-  covars <- colnames(multiPathwayReportDataSig)
-  covars2omics <- guessOmics(covars)
-  # sub("(PC[0-9]+|[23]k[123]|TRUE|FALSE)$","", covars, perl=TRUE,ignore.case=FALSE)
-  
-  MOlistPval <- tapply(colnames(multiPathwayReportDataSig),
-                       covars2omics, 
-                       summarizeOmicsResByMinPvalue, 
-                       mat=multiPathwayReportDataSig)
+  MOlistPval <- pvalueSummary(multiPathwayReportDataSig, excludeColumns = excludeColumns, as.list=TRUE)
   
   MOlistPathSig <- lapply(MOlistPval, function(pp) {
     names(which(pp <= zscoreThr))})
@@ -152,50 +118,16 @@ annotePathwayToFather <- function(pathways, graphiteDB, hierarchy) {
 computeOmicsIntersections <- function(multiPathwayReportData, pvalueThr=0.05,
                                       zscoreThr=0.05, excludeColumns=NULL){
   
-  if(!(any("pvalue" %in% colnames(multiPathwayReportData))))
-    stop("Data malformed. There is not a overall pvalue column.")
-  
-  if(is.null(grep(omicsRegexp, colnames(multiPathwayReportData))))
-    stop("Data malformed. There are no columns of with covariates as colnames.")
-  
-  if((!is.null(excludeColumns)) & (any(!(excludeColumns %in% colnames(multiPathwayReportData)))))
-    stop("Data malformed. Not all the colnames in excludeColumns are in the data.")
-  
-  if(!is.null(excludeColumns)){
-    if(c("pvalue") %in% excludeColumns) {
-      stop("You can not exclude the overall pvalue column, it is a required column.")
-    }}
-  
-  if(!is.numeric(pvalueThr))
-    stop("pvalueThr should be numeric.")
-  else if((pvalueThr > 1) | (pvalueThr < 0))
-    stop("pvalueThr should be a number included between 0 and 1.")
-  
-  columnsNotExcluded <- colnames(multiPathwayReportData)[!(colnames(multiPathwayReportData) %in% excludeColumns)]
-  multiPathwayReportData <- multiPathwayReportData[,columnsNotExcluded]
-  
-  colClasses <- sapply(multiPathwayReportData, class)
-  if(unique(colClasses) != "numeric"){
-    notNumericColumns <- colnames(multiPathwayReportData)[colClasses != "numeric"]
-    stop(paste0("Data malformed.", 
-                "The following columns are not numeric. 
-                You should consider the use of excludeColumns argument: ", 
-                paste(notNumericColumns, collapse = ", ")))
-  }
+  checkReportFormat(multiPathwayReportData)
+  checkColumnsExclusion(multiPathwayReportData, excludeColumns)
+
+  checkPvalueThresholdFormat(pvalueThr, "pvalueThr")
+  checkPvalueThresholdFormat(zscoreThr, "zscoreThr")
   
   universeSize <- NROW(multiPathwayReportData)
   multiPathwayReportDataSig <- multiPathwayReportData[multiPathwayReportData[,"pvalue"] <= pvalueThr,]
   
-  covarColumns <- !(colnames(multiPathwayReportData) %in% "pvalue")
-  multiPathwayReportDataSig <- multiPathwayReportDataSig[,covarColumns]
-  covars <- colnames(multiPathwayReportDataSig)
-  covars2omics <- guessOmics(covars)
-  # sub("(PC[0-9]+|[23]k[123]|TRUE|FALSE)$","", covars, perl=TRUE,ignore.case=FALSE)
-  
-  MOlistPval <- tapply(colnames(multiPathwayReportDataSig),
-                       covars2omics, 
-                       summarizeOmicsResByMinPvalue, 
-                       mat=multiPathwayReportDataSig)
+  MOlistPval <- pvalueSummary(multiPathwayReportDataSig, excludeColumns = excludeColumns, as.list=TRUE)
   
   MOlistPathSig <- lapply(MOlistPval, function(pp) {
     names(which(pp <= zscoreThr))})
@@ -217,4 +149,71 @@ computeOmicsIntersections <- function(multiPathwayReportData, pvalueThr=0.05,
 #' 
 stripModulesFromPathways <- function(pathways) {
   sub("\\.[0-9]+", "",pathways, perl=T)
+}
+
+#' Compute pvalue Summary
+#' 
+#' @inheritParams runSupertest
+#' @param as.list return a list rather than a data.frame
+#' 
+#' @return a list
+#' 
+#' @export
+#' 
+pvalueSummary <- function(multiPathwayReportData,
+                          excludeColumns=NULL, as.list=FALSE){
+  checkReportFormat(multiPathwayReportData)
+  checkColumnsExclusion(multiPathwayReportData, excludeColumns)
+  
+  columnsNotExcluded <- colnames(multiPathwayReportData)[!(colnames(multiPathwayReportData) %in% excludeColumns)]
+  multiPathwayReportData <- multiPathwayReportData[,columnsNotExcluded]
+  
+  colClasses <- sapply(multiPathwayReportData, class)
+  if(any(unique(colClasses) != "numeric")){
+    notNumericColumns <- colnames(multiPathwayReportData)[colClasses != "numeric"]
+    stop(paste0("Data malformed.", 
+                "The following columns are not numeric. 
+                You should consider the use of excludeColumns argument: ", 
+                paste(notNumericColumns, collapse = ", ")))
+  }
+  
+  covarColumns <- !(colnames(multiPathwayReportData) %in% "pvalue")
+  multiPathwayReportDataSig <- multiPathwayReportData[,covarColumns]
+  covars <- colnames(multiPathwayReportDataSig)
+  covars2omics <- guessOmics(covars)
+  
+  MOlistPval <- tapply(colnames(multiPathwayReportDataSig),
+                       covars2omics, 
+                       summarizeOmicsResByMinPvalue, 
+                       mat=multiPathwayReportDataSig)
+  if (as.list)
+    return(MOlistPval)
+  do.call(cbind, MOlistPval)
+}
+
+
+checkReportFormat <-function(multiPathwayReportData) {
+  if(!(any("pvalue" %in% colnames(multiPathwayReportData))))
+    stop("Data malformed. There is not a overall pvalue column.")
+  
+  if(is.null(grep(omicsRegexp, colnames(multiPathwayReportData))))
+    stop("Data malformed. There are no columns of with covariates as colnames.")
+}
+
+checkColumnsExclusion <- function(multiPathwayReportData, excludeColumns) {
+  if (is.null(excludeColumns))
+    return()
+  
+  if (any(!(excludeColumns %in% colnames(multiPathwayReportData))))
+    stop("Data malformed. Not all the colnames in excludeColumns are in the data.")
+
+  if("pvalue" %in% excludeColumns)
+    stop("You can not exclude the overall pvalue column, it is a required column.")
+}
+
+checkPvalueThresholdFormat <- function(thr, name="thr") {
+  if(!is.numeric(thr))
+    stop(paste0(name, " should be numeric."))
+  else if((thr > 1) | (thr < 0))
+    stop(paste0(name, " should be a number included between 0 and 1."))
 }
