@@ -85,7 +85,6 @@ summarizeColumnsByMask <- function(table, mask, thr=0.05) {
 #' Given a list of pathway results along with the summary table, it summaizes all module results 
 #'
 #' @param moduleSummary the table that summarized the module results
-#' @param summaryMask a factor to summarize. 'rm' marked columns are dropped
 #' @param momTestObj the list of MOM results
 #' @param thr significance threshold
 #'
@@ -95,23 +94,17 @@ summarizeColumnsByMask <- function(table, mask, thr=0.05) {
 #' \item{allGenes}{the genes used}
 #'
 #' @export
-multiOmicsModuleInterAnalysis <- function(moduleSummary, summaryMask, momTestObj, thr=0.05) {
-  if (!is.factor(summaryMask))
-    stop("summaryMask must be a factor.")
-  cols <- colnames(moduleSummary)
-  if (length(summaryMask) != length(cols))
-    stop("modules summary columns and summaryMask length must be equal.
-         The summaryMask will be converte in factors and used to merge columns (lowest pvalue is keep).
-         Columns marked with \"rm\" are removed.")
+multiOmicsModuleInterAnalysis <- function(moduleSummary, momTestObj, zscoreThr=0.05) {
   
-  summary <- summarizeColumnsByMask(moduleSummary, summaryMask, thr)
-
-  pathway <- summary$table$pathway
-  moduleNumber <- as.numeric(summary$table$module)
-  sigMask <- summary$sigMask
+  summary <- pvalueSummary(moduleSummary, excludeColumns = c("pathway", "module"))
+  
+  pathway <- moduleSummary$pathway
+  moduleNumber <- as.numeric(moduleSummary$module)
+  sigMask <- MOSClip:::na2false(summary <=0.05)
+  
   
   sig <- lapply(seq_along(pathway), function(i){
-    involvment <- guessInvolvement(momTestObj[[pathway[i]]], moduleNumber[i])
+    involvment <- MOSClip:::guessInvolvement(momTestObj[[pathway[i]]], moduleNumber[i])
     involvment[!sigMask[i, ]] <- NA
     involvment
   })
@@ -121,7 +114,7 @@ multiOmicsModuleInterAnalysis <- function(moduleSummary, summaryMask, momTestObj
     momTestObj[[pathway[i]]]@modules[[moduleNumber[i]]]
   })))
   
-  omicNames <- colnames(summary$sigMask)
+  omicNames <- colnames(sigMask)
   byOmicsSig <- lapply(seq_along(omicNames), function(i) {
     omic <- lapply(sig, function(pathModule){
       if(all(is.na(pathModule[[i]])))

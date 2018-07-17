@@ -20,7 +20,7 @@ filterExpr(exp, samples)
 filterMultiOmicsForSamples(MO, samples)
 
 resampling(fullMultiOmics, survAnnot, pathdb, nperm = 100,
-  pathwaySubset = NULL)
+  pathwaySubset = NULL, nPatients = 3)
 }
 \arguments{
 \item{li}{a list of summaries}

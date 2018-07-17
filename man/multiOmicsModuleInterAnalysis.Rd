@@ -4,15 +4,14 @@
 \alias{multiOmicsModuleInterAnalysis}
 \title{Multi Omics Module Inter Module Analysis}
 \usage{
-multiOmicsModuleInterAnalysis(moduleSummary, summaryMask, momTestObj,
-  thr = 0.05)
+multiOmicsModuleInterAnalysis(moduleSummary, momTestObj, zscoreThr = 0.05)
 }
 \arguments{
 \item{moduleSummary}{the table that summarized the module results}
 
-\item{summaryMask}{a factor to summarize. 'rm' marked columns are dropped}
-
 \item{momTestObj}{the list of MOM results}
+
+\item{summaryMask}{a factor to summarize. 'rm' marked columns are dropped}
 
 \item{thr}{significance threshold}
 }
