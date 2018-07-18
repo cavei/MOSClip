@@ -86,7 +86,7 @@ summarizeColumnsByMask <- function(table, mask, thr=0.05) {
 #'
 #' @param moduleSummary the table that summarized the module results
 #' @param momTestObj the list of MOM results
-#' @param thr significance threshold
+#' @param zscoreThr significance threshold
 #'
 #' @return a list
 #' \item{sigOmicsPart}{for each Omic the significant}
@@ -100,11 +100,11 @@ multiOmicsModuleInterAnalysis <- function(moduleSummary, momTestObj, zscoreThr=0
   
   pathway <- moduleSummary$pathway
   moduleNumber <- as.numeric(moduleSummary$module)
-  sigMask <- MOSClip:::na2false(summary <=0.05)
+  sigMask <- na2false(summary <=0.05)
   
   
   sig <- lapply(seq_along(pathway), function(i){
-    involvment <- MOSClip:::guessInvolvement(momTestObj[[pathway[i]]], moduleNumber[i])
+    involvment <- guessInvolvement(momTestObj[[pathway[i]]], moduleNumber[i])
     involvment[!sigMask[i, ]] <- NA
     involvment
   })
@@ -149,9 +149,14 @@ extractBadPrognosisProfile <- function(coxDiscrete) {
   covMatrix <- coxDiscrete[, -daysStatusIdx]
   
   worstProfile <- lapply(colnames(covMatrix), function(cov) {
+    if (length(table(covMatrix[,cov]))==1)
+      return(c(cov, "Flat"))
+      
     fit <- surv_fit(as.formula(paste0("Surv(days, status) ~ ",cov)), data = coxDiscrete)
     medianFit <- surv_median(fit)
     idx <- which.min(surv_median(fit)$median)
+    if (length(idx)==0)
+      return(c(cov, "No median"))
     unlist(strsplit(medianFit$strata[idx], "=", fixed = TRUE))
   })
   mt <- do.call(rbind, worstProfile)

@@ -11,9 +11,7 @@ multiOmicsModuleInterAnalysis(moduleSummary, momTestObj, zscoreThr = 0.05)
 
 \item{momTestObj}{the list of MOM results}
 
-\item{summaryMask}{a factor to summarize. 'rm' marked columns are dropped}
-
-\item{thr}{significance threshold}
+\item{zscoreThr}{significance threshold}
 }
 \value{
 a list

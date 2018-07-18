@@ -44,6 +44,8 @@ resampling(fullMultiOmics, survAnnot, pathdb, nperm = 100,
 \item{nperm}{number of permutation}
 
 \item{pathwaySubset}{a list of pathways to resample}
+
+\item{nPatients}{number of patients to remove for resampling}
 }
 \value{
 a matrix

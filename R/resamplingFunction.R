@@ -103,6 +103,7 @@ filterMultiOmicsForSamples <- function(MO, samples) {
 #' @param pathdb pathway dayabase
 #' @param nperm number of permutation
 #' @param pathwaySubset a list of pathways to resample
+#' @param nPatients number of patients to remove for resampling
 #' 
 #' @return list of the resampling tables of results
 #' 
