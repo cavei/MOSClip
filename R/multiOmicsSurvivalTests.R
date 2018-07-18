@@ -79,11 +79,8 @@ multiOmicsSurvivalPathwayTest <- function(omicsObj, graph, daysStatus,
     formula = paste0(survFormula, paste(colnames(covariates), collapse="+"))
 
   scox <- suppressWarnings(survClip::survivalcox(coxObj, formula)) ### Check warnings
-  # scox$moView <- moduleView
-  # scox$formula <- formula
-  # scox$moduleData <- moduleData
   new("MultiOmicsPathway", pvalue=scox$pvalue, zlist=scox$zlist, coxObj=scox$coxObj,
-      pathView=moduleView, formula=formula, pathData=moduleData,
+      pathView=moduleView, formula=formula,
       graphNEL=graph, title=pathName)
 }
 
@@ -136,13 +133,14 @@ multiOmicsSurvivalModuleTest <- function(omicsObj, graph, daysStatus,
   zlist    <- lapply(results, function(x) x$zlist)
   momics   <- lapply(results, function(x) x$moView)
   coxObjs  <- lapply(results, function(x) x$coxObj)
-  moduleData <- lapply(results, function(x) x$moduleData)
+  # moduleData <- lapply(results, function(x) x$moduleData)
   modules  <- cliques
   formulas <- lapply(results, function(x) x$formula)
 
   names(alphas) <- NULL
   new("MultiOmicsModules", alphas=alphas, zlists=zlist, coxObjs=coxObjs,
-      modulesView=momics, modules=modules, formulas=formulas, modulesData=moduleData,
+      modulesView=momics, modules=modules, formulas=formulas,
+      # modulesData=moduleData,
       graphNEL=graph, title=pathName)
 }
 

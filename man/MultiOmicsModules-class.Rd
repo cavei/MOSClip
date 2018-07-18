@@ -20,8 +20,6 @@ This class organize the results of the Multi Omics Module Survival Test analysis
 
 \item{\code{modules}}{a list woth the genes that belong to the module.}
 
-\item{\code{modulesData}}{a list, for each module the data splitted in omics. Redundant.}
-
 \item{\code{formulas}}{a list, for each module the character of the formula used in the coxph.}
 
 \item{\code{graphNEL}}{the graphNEL version of the pathway used in the analysis.}

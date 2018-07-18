@@ -9,7 +9,6 @@ setClassUnion("characterOrNULL", c("character", "NULL"))
 #' @slot coxObjs a list with all the data.frame used for coxph of each module.
 #' @slot modulesView a list of module information: for each omic the module data, the method used and the covariate analyzed.
 #' @slot modules a list woth the genes that belong to the module.
-#' @slot modulesData a list, for each module the data splitted in omics. Redundant.
 #' @slot formulas a list, for each module the character of the formula used in the coxph.
 #' @slot graphNEL the graphNEL version of the pathway used in the analysis.
 #' @slot title the name of the pathway.
@@ -20,11 +19,9 @@ setClass("MultiOmicsModules", package = "MOSClip",
                    coxObjs = "list",
                    modulesView  = "list",
                    modules     = "list",
-                   modulesData = "list",
                    formulas = "list",
                    graphNEL = "graphNEL",
-                   title = "characterOrNULL"),
-         contains = "list")
+                   title = "characterOrNULL"))
 
 setMethod("show",
           signature = "MultiOmicsModules",
@@ -64,7 +61,6 @@ setMethod("show",
 #' @slot coxObj a data.frame used for the coxph model.
 #' @slot pathView a list, for each omic the pathway data, the method used and the covariate analyzed.
 #' @slot formulas a list, for each module the character of the formula used in the coxph.
-#' @slot pathData a list, for each omics the data analyzed. Redundant.
 #' @slot graphNEL the graphNEL version of the pathway used in the analysis.
 #' @slot title the name of the pathway.
 #'
@@ -77,10 +73,8 @@ setClass("MultiOmicsPathway", package = "MOSClip",
                    coxObj = "data.frame",
                    pathView = "list",
                    formula = "character",
-                   pathData = "list",
                    graphNEL = "graphNEL",
-                   title = "characterOrNULL"),
-         contains = "list")
+                   title = "characterOrNULL"))
 
 setMethod("show",
           signature = "MultiOmicsPathway",
