@@ -5,7 +5,8 @@
 \title{Plot KM of the module by omics}
 \usage{
 plotModuleKM(pathway, moduleNumber, formula = "Surv(days, status) ~ PC1",
-  fileName = NULL, paletteNames = NULL, h = 9, w = 7)
+  fileName = NULL, paletteNames = NULL, h = 9, w = 7,
+  risk.table = TRUE, pval = TRUE, size = 1)
 }
 \arguments{
 \item{pathway}{MultiOmicsModule pathway object}
@@ -21,6 +22,12 @@ plotModuleKM(pathway, moduleNumber, formula = "Surv(days, status) ~ PC1",
 \item{h}{the height of the plot}
 
 \item{w}{the width of the plot}
+
+\item{risk.table}{logical to show risk.table}
+
+\item{pval}{logical to show pvalue}
+
+\item{size}{line width of the KM curves}
 }
 \description{
 Given the pathway, it creates the Kaplan-meier curves following the formula.

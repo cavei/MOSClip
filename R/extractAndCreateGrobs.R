@@ -1,7 +1,9 @@
 #' @importFrom grDevices colorRampPalette
 #' @importFrom RColorBrewer brewer.pal
 #' @importFrom pheatmap pheatmap
-generateHeatmapGrobTable <- function(i, involved, annotationFull, palettes, annotationCol=NA, orgDbi="org.Hs.eg.db", oldFation=TRUE) {
+generateHeatmapGrobTable <- function(i, involved, annotationFull, palettes,
+                                     annotationCol=NA, orgDbi="org.Hs.eg.db", oldFation=TRUE,
+                                     fontsize_row = 10, fontsize_col = 1) {
   heatMatrix <- involved[[i]]$sigModule
   omic <- guessOmic(involved[[i]]$covsConsidered)
   
@@ -42,8 +44,8 @@ generateHeatmapGrobTable <- function(i, involved, annotationFull, palettes, anno
                      color=cls,
                      cluster_rows=cluster_rows,
                      cluster_cols=F,
-                     fontsize_row = 6,
-                     fontsize_col = 4,
+                     fontsize_row = fontsize_row,
+                     fontsize_col = fontsize_col,
                      labels_row=lbs,
                      annotation_col=annotationFull,
                      annotation_colors = annotationCol,

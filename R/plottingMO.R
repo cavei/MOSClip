@@ -8,6 +8,10 @@
 #' @param paletteNames three palettes
 #' @param additionalAnnotations optional additional sample annotations
 #' @param additionalPaletteNames optional additional colors for annotations
+#' @param withSampleNames create also the samples names
+#' @param fontsize_row size of the fonts for rows
+#' @param fontsize_col like fontsize_row but for columns
+#' @param nrowsHeatmaps magnification respect to annotation of sample (annotations take 1 row)
 #' @param h the height of the plot
 #' @param w the width of the plot
 #'
@@ -17,7 +21,7 @@
 #' @importFrom pheatmap pheatmap
 #' @importFrom gridExtra arrangeGrob
 #' @importFrom ggplot2 ggsave
-#' @importFrom grid grid.newpage grid.draw
+#' @importFrom grid gpar grid.newpage grid.draw rectGrob
 #' @importFrom graphics plot
 #' @importFrom stats relevel
 #' 
@@ -25,6 +29,9 @@
 plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
                             paletteNames=NULL,
                             additionalAnnotations=NULL, additionalPaletteNames=NULL,
+                            withSampleNames=TRUE,
+                            fontsize_row = 10, fontsize_col = 1,
+                            nrowsHeatmaps=3,
                             h = 9, w=7) {
   
   checkmate::assertClass(pathway, "MultiOmicsPathway")
@@ -114,19 +121,25 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
   # generate the heatmaps grobs
   gts <- lapply(seq_along(involved), generateHeatmapGrobTable, involved=involved,
                 annotationFull=annotationFull, palettes=paletteNames,
-                annotationCol=ann_col, oldFation=FALSE)
+                annotationCol=ann_col, oldFation=FALSE, fontsize_row = fontsize_row,
+                fontsize_col = fontsize_col)
   
   hmaps <- lapply(gts, function(x) {
     createHeatmapGrob(x)
   })
   annotationGrob <- createTopAnnotationGrob(gts[[1]])
-  sampleNamesGrob <- createSamplesNamesGrob(gts[[1]])
+  if (withSampleNames) {
+    sampleNamesGrob <- createSamplesNamesGrob(gts[[1]])
+  } else {
+    sampleNamesGrob <- grid::rectGrob(width = .98, height = .98,
+                                      gp=grid::gpar(lwd=0, col=NA, fill=NA))
+  }
   legendGrob <- createAnnotationLegendGrob(gts[[1]])
-  layout_matrix <- createLayout(length(hmaps))
-  myplot <- gridExtra::arrangeGrob(grobs=c(hmaps,
-                                list(annotationGrob),
-                                list(sampleNamesGrob),
-                                list(legendGrob)),
+  layout_matrix <- createLayout(length(hmaps), nrowsHeatmaps=nrowsHeatmaps)
+  grobs <- c(hmaps, list(annotationGrob), list(sampleNamesGrob), list(legendGrob))
+  # grobs <- grobs[!sapply(grobs, is.null)]
+  myplot <- gridExtra::arrangeGrob(grobs=grobs, layout_matrix = layout_matrix)
+  myplot <- gridExtra::arrangeGrob(grobs=grobs,
                         layout_matrix = layout_matrix)
   
   if(!is.null(fileName)) {
@@ -147,6 +160,9 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
 #' @param paletteNames three palettes
 #' @param h the height of the plot
 #' @param w the width of the plot
+#' @param risk.table logical to show risk.table
+#' @param pval logical to show pvalue
+#' @param size line width of the KM curves
 #'
 #' @return NULL
 #'
@@ -159,7 +175,7 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
 #' @export
 plotPathwayKM <- function(pathway, formula = "Surv(days, status) ~ PC1",
                           fileName=NULL, paletteNames = NULL,
-                          h = 9, w=7) {
+                          h = 9, w=7, risk.table=TRUE, pval=TRUE, size=1) {
   
   checkmate::assertClass(pathway, "MultiOmicsPathway")
   
@@ -181,7 +197,7 @@ plotPathwayKM <- function(pathway, formula = "Surv(days, status) ~ PC1",
     }
   }
   
-  p <- survminer::ggsurvplot(fit, data = coxObj, risk.table = TRUE, pval=T, palette=palette)
+  p <- survminer::ggsurvplot(fit, data = coxObj, risk.table = risk.table, pval=pval, palette=palette, size=size)
   
   if(!is.null(fileName)) {
     ggplot2::ggsave(filename = fileName, p, height = h, width = w)
@@ -202,6 +218,10 @@ plotPathwayKM <- function(pathway, formula = "Surv(days, status) ~ PC1",
 #' @param paletteNames three palettes
 #' @param additionalAnnotations optional additional sample annotations
 #' @param additionalPaletteNames optional additional colors for annotations
+#' @param withSampleNames create also the samples names
+#' @param fontsize_row size of the fonts for rows
+#' @param fontsize_col like fontsize_row but for columns
+#' @param nrowsHeatmaps magnification respect to annotation of sample (annotations take 1 row)
 #' @param h the height of the plot
 #' @param w the width of the plot
 #'
@@ -209,7 +229,7 @@ plotPathwayKM <- function(pathway, formula = "Surv(days, status) ~ PC1",
 #' @importFrom checkmate assertClass
 #' @importFrom pheatmap pheatmap
 #' @importFrom gridExtra arrangeGrob
-#' @importFrom grid grid.newpage grid.draw
+#' @importFrom grid gpar grid.newpage grid.draw rectGrob
 #' @importFrom ggplot2 ggsave
 #' @importFrom graphics plot
 #' @importFrom stats relevel
@@ -218,6 +238,9 @@ plotPathwayKM <- function(pathway, formula = "Surv(days, status) ~ PC1",
 plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL,
                            fileName=NULL, paletteNames = NULL,
                            additionalAnnotations=NULL, additionalPaletteNames=NULL,
+                           withSampleNames=TRUE, 
+                           fontsize_row = 10, fontsize_col = 1,
+                           nrowsHeatmaps=3,
                            h = 9, w=7) {
   
   checkmate::assertClass(pathway, "MultiOmicsModules")
@@ -306,20 +329,24 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL,
   # generate the heatmaps grobs
   gts <- lapply(seq_along(involved), generateHeatmapGrobTable, involved=involved,
                 annotationFull=annotationFull, palettes=paletteNames,
-                annotationCol=ann_col, oldFation=FALSE)
+                annotationCol=ann_col, oldFation=FALSE,
+                fontsize_row = fontsize_row, fontsize_col = fontsize_col)
   
   hmaps <- lapply(gts, function(x) {
     createHeatmapGrob(x)
   })
   annotationGrob <- createTopAnnotationGrob(gts[[1]])
-  sampleNamesGrob <- createSamplesNamesGrob(gts[[1]])
+  if (withSampleNames) {
+    sampleNamesGrob <- createSamplesNamesGrob(gts[[1]])
+  } else {
+    sampleNamesGrob <- grid::rectGrob(width = .98, height = .98,
+                                      gp=grid::gpar(lwd=0, col=NA, fill=NA))
+  }
   legendGrob <- createAnnotationLegendGrob(gts[[1]])
-  layout_matrix <- createLayout(length(hmaps))
-  myplot <- gridExtra::arrangeGrob(grobs=c(hmaps,
-               list(annotationGrob),
-               list(sampleNamesGrob),
-               list(legendGrob)),
-               layout_matrix = layout_matrix)
+  layout_matrix <- createLayout(length(hmaps), nrowsHeatmaps=nrowsHeatmaps)
+  grobs <- c(hmaps, list(annotationGrob), list(sampleNamesGrob), list(legendGrob))
+  myplot <- gridExtra::arrangeGrob(grobs=grobs, layout_matrix = layout_matrix)
+  
   if(!is.null(fileName)) {
     ggplot2::ggsave(filename = fileName, myplot, height = h, width = w)
   } else {
@@ -340,6 +367,9 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL,
 #' @param paletteNames three palettes
 #' @param h the height of the plot
 #' @param w the width of the plot
+#' @param risk.table logical to show risk.table
+#' @param pval logical to show pvalue
+#' @param size line width of the KM curves
 #'
 #' @return NULL
 #' @importFrom checkmate assertClass
@@ -350,8 +380,8 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL,
 #' 
 #' @export
 plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ PC1",
-                         fileName=NULL, paletteNames=NULL,
-                         h = 9, w=7) {
+                         fileName=NULL, paletteNames=NULL, h = 9, w=7,
+                         risk.table=TRUE, pval=TRUE, size=1) {
   
   checkmate::assertClass(pathway, "MultiOmicsModules")
   
@@ -380,7 +410,7 @@ plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ 
     }
   }
   
-  p <- survminer::ggsurvplot(fit, data = coxObj, risk.table = TRUE, pval=T, palette=unname(palette))
+  p <- survminer::ggsurvplot(fit, data = coxObj, risk.table = risk.table, pval=pval, palette=unname(palette), size=size)
 
   if(!is.null(fileName)) {
     ggplot2::ggsave(filename = fileName, p, height = h, width = w)

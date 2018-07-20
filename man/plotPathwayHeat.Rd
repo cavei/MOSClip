@@ -6,7 +6,9 @@
 \usage{
 plotPathwayHeat(pathway, sortBy = NULL, fileName = NULL,
   paletteNames = NULL, additionalAnnotations = NULL,
-  additionalPaletteNames = NULL, h = 9, w = 7)
+  additionalPaletteNames = NULL, withSampleNames = TRUE,
+  fontsize_row = 10, fontsize_col = 1, nrowsHeatmaps = 3, h = 9,
+  w = 7)
 }
 \arguments{
 \item{pathway}{MultiOmicsPathway pathway object}
@@ -20,6 +22,14 @@ plotPathwayHeat(pathway, sortBy = NULL, fileName = NULL,
 \item{additionalAnnotations}{optional additional sample annotations}
 
 \item{additionalPaletteNames}{optional additional colors for annotations}
+
+\item{withSampleNames}{create also the samples names}
+
+\item{fontsize_row}{size of the fonts for rows}
+
+\item{fontsize_col}{like fontsize_row but for columns}
+
+\item{nrowsHeatmaps}{magnification respect to annotation of sample (annotations take 1 row)}
 
 \item{h}{the height of the plot}
 
