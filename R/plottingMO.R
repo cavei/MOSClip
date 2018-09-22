@@ -163,6 +163,7 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
 #' @param risk.table logical to show risk.table
 #' @param pval logical to show pvalue
 #' @param size line width of the KM curves
+#' @param inYears set time in years
 #'
 #' @return NULL
 #'
@@ -374,6 +375,7 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL,
 #' @param risk.table logical to show risk.table
 #' @param pval logical to show pvalue
 #' @param size line width of the KM curves
+#' @param inYears set time in years
 #'
 #' @return NULL
 #' @importFrom checkmate assertClass
