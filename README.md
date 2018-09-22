@@ -10,3 +10,8 @@ MOSClip has a modular structure, allowing the use of one or multiple different o
 Furthermore, in MOSClip multiple efforts have been dedicated to the implementation of specific graphical tools to browse,
 manage and provide help in the interpretation of results.
 
+To install MOSClip please run 
+
+devtools::install_github("cavei/MOSClip")
+
+from your R prompt
