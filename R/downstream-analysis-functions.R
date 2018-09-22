@@ -100,14 +100,16 @@ multiOmicsModuleInterAnalysis <- function(moduleSummary, momTestObj, zscoreThr=0
   
   pathway <- moduleSummary$pathway
   moduleNumber <- as.numeric(moduleSummary$module)
-  sigMask <- na2false(summary <=0.05)
-  
+  sigMask <- na2false(summary <= zscoreThr)
   
   sig <- lapply(seq_along(pathway), function(i){
     involvment <- guessInvolvement(momTestObj[[pathway[i]]], moduleNumber[i])
     involvment[!sigMask[i, ]] <- NA
     involvment
   })
+  
+  cumulativeMut <- lapply(sig, extractMutationsCumulativeProfiles)
+  names(cumulativeMut) <- paste0(pathway,'.',moduleNumber)
   
   # estraggo tutti i geni che appartengono ai moduli
   modulesGenes <- unique(unlist(lapply(seq_along(pathway), function(i){
@@ -128,7 +130,25 @@ multiOmicsModuleInterAnalysis <- function(moduleSummary, momTestObj, zscoreThr=0
     omic
   })
   names(byOmicsSig) <- omicNames
-  list(sigOmicsPart=byOmicsSig, pvaluesSummary=summary, allGenes=modulesGenes)
+  list(sigOmicsPart=byOmicsSig, pvaluesSummary=summary, allGenes=modulesGenes, cumulativeMutProfiles=cumulativeMut)
+}
+
+extractMutationsCumulativeProfiles <- function(paths, omicName="mut") {
+    profiles <- lapply(paths, function(x) {
+      if (!all(is.na(x))) {
+        omic <- MOSClip:::guessOmic(x$covsConsidered)
+        if (omic==omicName) {
+          x$discrete
+        } 
+      }
+    })
+    profiles <- profiles[!sapply(profiles, is.null)]
+    if (length(profiles)==0){
+      NA
+    } else {
+      profiles
+    }
+    
 }
 
 #' Extract the worst profile
