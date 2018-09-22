@@ -1,10 +1,10 @@
 getRiskTable <- function(pathway, formula = "Surv(days, status) ~ PC1",
                           fileName=NULL, paletteNames = NULL) {
-  require(survival)
+  requireNamespace("survival")
   checkmate::assertClass(pathway, "MultiOmicsPathway")
   
-  involved <- MOSClip:::guessInvolvementPathway(pathway)
-  annotationFull <- MOSClip:::formatAnnotations(involved, sortBy=NULL)
+  involved <- guessInvolvementPathway(pathway)
+  annotationFull <- formatAnnotations(involved, sortBy=NULL)
   daysAndStatus <- pathway@coxObj[, c("status", "days"), drop=F]
   coxObj <- data.frame(daysAndStatus, annotationFull[row.names(daysAndStatus), , drop=F])
   
@@ -25,6 +25,10 @@ getRiskTable <- function(pathway, formula = "Surv(days, status) ~ PC1",
   t
 }
 
+#' Extrac the risk table from survminer object
+#' 
+#' @param survminerObj a survminer object
+#' 
 #' @export 
 extractRiskTable <- function(survminerObj) {
   df <- survminerObj$data.survtable
