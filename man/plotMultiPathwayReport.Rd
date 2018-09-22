@@ -4,7 +4,8 @@
 \alias{plotMultiPathwayReport}
 \title{Summarize and plot pathways' info from a list of MultiOmicsPathway (MOP)}
 \usage{
-plotMultiPathwayReport(multiPathwayList, top = 25, MOcolors = NULL, ...)
+plotMultiPathwayReport(multiPathwayList, top = 25, MOcolors = NULL,
+  ...)
 }
 \arguments{
 \item{multiPathwayList}{MultiOmicsPathway list pathway object}

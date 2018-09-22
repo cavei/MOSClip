@@ -4,8 +4,8 @@
 \alias{summarizeToBinaryEvents}
 \title{Summarize To Binary Events}
 \usage{
-summarizeToBinaryEvents(data, features, name = "bin", binaryClassMin = 10,
-  cliques = NULL)
+summarizeToBinaryEvents(data, features, name = "bin",
+  binaryClassMin = 10, cliques = NULL)
 }
 \arguments{
 \item{data}{a data matrix}

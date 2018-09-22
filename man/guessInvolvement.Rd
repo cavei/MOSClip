@@ -4,7 +4,8 @@
 \alias{guessInvolvement}
 \title{Guess the most influent features from MultiOmics Survival Results.}
 \usage{
-guessInvolvement(pathway, moduleNumber, loadThr = 0.6, n = 3, atleast = 1)
+guessInvolvement(pathway, moduleNumber, loadThr = 0.6, n = 3,
+  atleast = 1)
 }
 \arguments{
 \item{pathway}{MultiOmicsModule from a pathway.}

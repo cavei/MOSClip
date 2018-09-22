@@ -13,8 +13,6 @@ Omics(...)
 }
 \description{
 This class is the storage for the different omic datasets that we need to analyze.
-
-Wrapper of Omics
 }
 \section{Slots}{
 

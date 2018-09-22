@@ -66,6 +66,4 @@ For internal use only
 For internal use only
 
 For internal use only
-
-Resampling function
 }

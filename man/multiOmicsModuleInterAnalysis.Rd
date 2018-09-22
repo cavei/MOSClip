@@ -4,7 +4,8 @@
 \alias{multiOmicsModuleInterAnalysis}
 \title{Multi Omics Module Inter Module Analysis}
 \usage{
-multiOmicsModuleInterAnalysis(moduleSummary, momTestObj, zscoreThr = 0.05)
+multiOmicsModuleInterAnalysis(moduleSummary, momTestObj,
+  zscoreThr = 0.05)
 }
 \arguments{
 \item{moduleSummary}{the table that summarized the module results}

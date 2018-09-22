@@ -6,7 +6,7 @@
 \usage{
 plotModuleKM(pathway, moduleNumber, formula = "Surv(days, status) ~ PC1",
   fileName = NULL, paletteNames = NULL, h = 9, w = 7,
-  risk.table = TRUE, pval = TRUE, size = 1)
+  risk.table = TRUE, pval = TRUE, size = 1, inYears = FALSE)
 }
 \arguments{
 \item{pathway}{MultiOmicsModule pathway object}
@@ -28,6 +28,8 @@ plotModuleKM(pathway, moduleNumber, formula = "Surv(days, status) ~ PC1",
 \item{pval}{logical to show pvalue}
 
 \item{size}{line width of the KM curves}
+
+\item{inYears}{set time in years}
 }
 \description{
 Given the pathway, it creates the Kaplan-meier curves following the formula.
