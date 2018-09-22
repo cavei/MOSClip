@@ -7,6 +7,7 @@
 #' the \code{\link{multiPathwayReport}} or \code{\link{multiPathwayModuleReport}} functions.
 #' @param pvalueThr numeric indicating the cut-off for overall pvalue
 #' @param zscoreThr numeric indicating the cut-off for covariates coefficients 
+#' @param resampligThr numeric the number of success in the resamplig procedure
 #' @param plot character indicating the layout for plotting. 
 #' It is one of \code{circular}, \code{landscape} or \code{no}. 
 #' By default, plot="circular", if plot="no" no plot will be provided.
@@ -41,6 +42,7 @@
 #' @export
 runSupertest <- function(multiPathwayReportData, pvalueThr=0.05,
                          zscoreThr=0.05,
+                         resampligThr = NULL,
                          plot=c('circular','landscape','noplot'), 
                          sort.by=c('set','size','degree','p-value'),
                          excludeColumns=NULL,
@@ -62,6 +64,12 @@ runSupertest <- function(multiPathwayReportData, pvalueThr=0.05,
   
   universeSize <- NROW(multiPathwayReportData)
   multiPathwayReportDataSig <- multiPathwayReportData[multiPathwayReportData[,"pvalue"] <= pvalueThr,]
+  
+  if (!is.null(resampligThr)) {
+    if (is.null(multiPathwayReportDataSig$resamplingCount))
+      stop("resamplingCount column not found. Try addResamplingCounts")
+    multiPathwayReportDataSig <- multiPathwayReportDataSig[multiPathwayReportDataSig[,"resamplingCount"] >= resampligThr,]
+  }
   
   MOlistPval <- pvalueSummary(multiPathwayReportDataSig, excludeColumns = excludeColumns, as.list=TRUE)
   
@@ -116,7 +124,7 @@ annotePathwayToFather <- function(pathways, graphiteDB, hierarchy) {
 #' @importFrom reshape melt
 #' @export
 computeOmicsIntersections <- function(multiPathwayReportData, pvalueThr=0.05,
-                                      zscoreThr=0.05, excludeColumns=NULL){
+                                      zscoreThr=0.05, resampligThr = NULL, excludeColumns=NULL){
   
   checkReportFormat(multiPathwayReportData)
   checkColumnsExclusion(multiPathwayReportData, excludeColumns)
@@ -126,6 +134,12 @@ computeOmicsIntersections <- function(multiPathwayReportData, pvalueThr=0.05,
   
   universeSize <- NROW(multiPathwayReportData)
   multiPathwayReportDataSig <- multiPathwayReportData[multiPathwayReportData[,"pvalue"] <= pvalueThr,]
+  
+  if (!is.null(resampligThr)) {
+    if (is.null(multiPathwayReportDataSig$resamplingCount))
+      stop("resamplingCount column not found. Try addResamplingCounts")
+    multiPathwayReportDataSig <- multiPathwayReportDataSig[multiPathwayReportDataSig[,"resamplingCount"] >= resampligThr,]
+  }
   
   MOlistPval <- pvalueSummary(multiPathwayReportDataSig, excludeColumns = excludeColumns, as.list=TRUE)
   
@@ -158,6 +172,7 @@ stripModulesFromPathways <- function(pathways) {
 #' 
 #' @return a list
 #' 
+#' @importFrom stats na.omit
 #' @export
 #' 
 pvalueSummary <- function(multiPathwayReportData,
@@ -168,10 +183,11 @@ pvalueSummary <- function(multiPathwayReportData,
   columnsNotExcluded <- colnames(multiPathwayReportData)[!(colnames(multiPathwayReportData) %in% excludeColumns)]
   multiPathwayReportData <- multiPathwayReportData[,columnsNotExcluded]
   
+  
   colClasses <- sapply(multiPathwayReportData, class)
   if(any(unique(colClasses) != "numeric")){
     notNumericColumns <- colnames(multiPathwayReportData)[colClasses != "numeric"]
-    stop(paste0("Data malformed.", 
+    stop(paste0("Data malformed. ", 
                 "The following columns are not numeric. 
                 You should consider the use of excludeColumns argument: ", 
                 paste(notNumericColumns, collapse = ", ")))
@@ -179,6 +195,17 @@ pvalueSummary <- function(multiPathwayReportData,
   
   covarColumns <- !(colnames(multiPathwayReportData) %in% "pvalue")
   multiPathwayReportDataSig <- multiPathwayReportData[,covarColumns]
+  
+  malformedCoulums <- apply(multiPathwayReportDataSig, 2, function(col) any(na.omit(col) > 1 | na.omit(col) < 0))
+  
+  if (any(malformedCoulums)) {
+    stop(paste0("Data malformed. The following columns are not pvalues
+                since they have values greater than 1 or lower than 0.
+                You should consider the use of excludeColumns argument: ",
+                paste(colnames(multiPathwayReportDataSig)[malformedCoulums], collapse = ", ")
+                ))
+  }
+  
   covars <- colnames(multiPathwayReportDataSig)
   covars2omics <- guessOmics(covars)
   
