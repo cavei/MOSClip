@@ -15,4 +15,4 @@ Imports: methods, survClip, survminer, graph, houseOfClipUtility,
 Remotes: github::cavei/houseOfClipUtility, github::cavei/survClip
 Suggests: RUnit, BiocGenerics, MASS, BiocStyle, org.Hs.eg.db, testthat
 License: AGPL-3
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.0
