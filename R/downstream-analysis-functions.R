@@ -136,7 +136,7 @@ multiOmicsModuleInterAnalysis <- function(moduleSummary, momTestObj, zscoreThr=0
 extractMutationsCumulativeProfiles <- function(paths, omicName="mut") {
     profiles <- lapply(paths, function(x) {
       if (!all(is.na(x))) {
-        omic <- MOSClip:::guessOmic(x$covsConsidered)
+        omic <- guessOmic(x$covsConsidered)
         if (omic==omicName) {
           x$discrete
         } 
