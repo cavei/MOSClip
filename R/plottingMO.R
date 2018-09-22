@@ -175,13 +175,17 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
 #' @export
 plotPathwayKM <- function(pathway, formula = "Surv(days, status) ~ PC1",
                           fileName=NULL, paletteNames = NULL,
-                          h = 9, w=7, risk.table=TRUE, pval=TRUE, size=1) {
+                          h = 9, w=7, risk.table=TRUE, pval=TRUE, size=1, inYears=FALSE) {
   
   checkmate::assertClass(pathway, "MultiOmicsPathway")
   
   involved <- guessInvolvementPathway(pathway)
   annotationFull <- formatAnnotations(involved, sortBy=NULL)
   daysAndStatus <- pathway@coxObj[, c("status", "days"), drop=F]
+  
+  if (inYears)
+    daysAndStatus$days <- daysAndStatus$days/365.24
+  
   coxObj <- data.frame(daysAndStatus, annotationFull[row.names(daysAndStatus), , drop=F])
   
   fit <- survminer::surv_fit(formula(formula), data = coxObj)
@@ -381,7 +385,7 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL,
 #' @export
 plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ PC1",
                          fileName=NULL, paletteNames=NULL, h = 9, w=7,
-                         risk.table=TRUE, pval=TRUE, size=1) {
+                         risk.table=TRUE, pval=TRUE, size=1, inYears=FALSE) {
   
   checkmate::assertClass(pathway, "MultiOmicsModules")
   
@@ -390,6 +394,9 @@ plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ 
   annotationFull <- formatAnnotations(involved, sortBy=NULL)
   
   daysAndStatus <- pathway@coxObjs[[moduleNumber]][, c("status", "days"), drop=F]
+  if (inYears)
+    daysAndStatus$days <- daysAndStatus$days/365.24
+  
   coxObj <- data.frame(daysAndStatus, annotationFull[row.names(daysAndStatus), , drop=F])
 
   fit <- survminer::surv_fit(formula(formula), data = coxObj)
