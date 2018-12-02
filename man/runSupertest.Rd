@@ -5,7 +5,7 @@
 \title{Performs statistical tests of the pathway intersections among omics.}
 \usage{
 runSupertest(multiPathwayReportData, pvalueThr = 0.05,
-  zscoreThr = 0.05, resampliThr = NULL, plot = c("circular",
+  zscoreThr = 0.05, resampligThr = NULL, plot = c("circular",
   "landscape", "noplot"), sort.by = c("set", "size", "degree",
   "p-value"), excludeColumns = NULL, color.on = "#f6bb42",
   color.off = "#D3D3D3")
@@ -18,7 +18,7 @@ the \code{\link{multiPathwayReport}} or \code{\link{multiPathwayModuleReport}} f
 
 \item{zscoreThr}{numeric indicating the cut-off for covariates coefficients}
 
-\item{resampliThr}{numeric the number of success in the resamplig procedure}
+\item{resampligThr}{numeric the number of success in the resamplig procedure}
 
 \item{plot}{character indicating the layout for plotting. 
 It is one of \code{circular}, \code{landscape} or \code{no}. 

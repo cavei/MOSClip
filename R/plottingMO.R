@@ -452,7 +452,7 @@ plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
   
   checkmate::assertClass(pathway, "MultiOmicsModules")
 
-  net <- igraph.from.graphNEL(pathway@graphNEL)
+  net <- igraph::igraph.from.graphNEL(pathway@graphNEL)
   moduleGenes <- pathway@modules[[moduleNumber]]
   net <- igraph::simplify(net, remove.multiple = T, remove.loops = T)
   color <- rep("grey", length(V(net)))

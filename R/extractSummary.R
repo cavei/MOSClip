@@ -14,18 +14,25 @@
 #' @export
 
 extractSummaryFromBinary <- function(omic, n=3) {
-  moduleMat <- t(omic$dataModule)
-  involved <- head(mostlyMutated(moduleMat), n)
-  sigModule <- omic$dataModule[row.names(involved), , drop=F]
+  moduleMat <- omic$dataModule
+  covs <- omic$namesCov
+  # involved <- head(mostlyMutated(moduleMat), n)
+  # sigModule <- omic$dataModule[row.names(involved), , drop=F]
+  impact <- lapply(covs, mostlyMutated, moduleMat=t(omic$dataModule), name=omic$omicName,
+                   eventThr=omic$eventThr)
+  mostlyImpacted <- lapply(impact, head, n=n)
+  involved <- unique(unlist(lapply(mostlyImpacted, row.names)))
+  sigModule <- moduleMat[involved, , drop=F]
+  
   discrete=data.frame(lapply(omic$x, as.numeric), row.names=row.names(omic$x))
-  list(sigModule=sigModule, discrete=discrete, subset=involved, covsConsidered=omic$namesCov)
+  list(sigModule=sigModule, discrete=discrete, subset=mostlyImpacted, covsConsidered=omic$namesCov)
 }
 
-mostlyMutated <- function(moduleMat) {
-  priority <- colSums(moduleMat, na.rm=T)
-  priority <- data.frame(row.names = names(priority), patientsMutated=priority)
-  priority[order(priority$patientsMutated, decreasing = T),, drop=F]
-}
+# mostlyMutated <- function(moduleMat) {
+#   priority <- colSums(moduleMat, na.rm=T)
+#   priority <- data.frame(row.names = names(priority), patientsMutated=priority)
+#   priority[order(priority$patientsMutated, decreasing = T),, drop=F]
+# }
 
 #' Extract Summary CLuster from MultiOmics Objects
 #'
@@ -46,6 +53,10 @@ extractSummaryFromCluster <-function(omic, n=3) {
   moduleMat <- t(omic$dataModule)
   classes <- omic$x[,1]
   KMsigMat <- KWtest(moduleMat, classes)
+  
+  if (is.null(names(omic$cls)))
+    stop("cls in omic need to be a list or named vector")
+  
   g <- lapply(names(omic$cls), function(gene) {
     cbind(gene, omic$cls[[gene]])
   })
@@ -99,13 +110,13 @@ extractSummaryFromPCA <- function(omic, moduleCox, loadThr=0.6, atleast=1) {
 }
 
 #' @importFrom survminer surv_cutpoint surv_categorize
-createDiscreteClasses <- function(coxObj, covs) {
+createDiscreteClasses <- function(coxObj, covs, labels= c("low", "high")) {
   diff <- setdiff(covs, colnames(coxObj))
   if (length(diff) != 0) {
     stop(paste0(paste(diff, collapse=", "), " not in coxObj."))
   }
-  sc <- surv_cutpoint(coxObj, time="days", event="status", variables = covs)
-  surv_categorize(sc)
+  sc <- surv_cutpoint(coxObj, time="days", event="status", variables = covs, minprop=0.01)
+  surv_categorize(sc, labels=labels)
 }
 
 extractHighLoadingsGenes <- function(loadings, thr, atleast=1) {
@@ -128,4 +139,48 @@ collapse <- function(list) {
   tapply(seq_len(NROW(df)), df$genes, function(idx){
     paste(df$components[idx], collapse=";")
   }, simplify = F)
+}
+
+#' Extract Summary Binary from MultiOmics Objects
+#'
+#' Given an omic summarized by "summarizeToBinaryEvents" extract the most important features.
+#'
+#' @param omic a summarized omic
+#' @param moduleCox the coxObj of the interesting module
+#' @param n maximum number of features to retrieve
+#'
+#' @return Meant for internal use only. The summary for omic summarized using clusters
+#' \item{sigModule}{the original data for significant features}
+#' \item{discrete}{the discrete version of the significant covariates converted (when needed)
+#'   into the discrete version}
+#' \item{subset}{data.frame(row.names=names(topGenes), metClust=topGenes)}
+#' \item{covsConsidered}{the name of the considered omic}
+#'
+#' @export
+extractSummaryFromNumberOfEvents <- function(omic, moduleCox, n=3) {
+  covs <- omic$namesCov
+  moduleMat=omic$dataModule
+  discreteClass <- createDiscreteClasses(coxObj=moduleCox, covs, labels=c("norm","apli/del"))
+  impact <- lapply(covs, mostlyMutated, moduleMat=t(omic$dataModule), name=omic$omicName, 
+                   eventThr = omic$eventThr)
+  mostlyImpacted <- lapply(impact, head, n=n)
+  mostlyImpactedGenes <- unique(unlist(lapply(mostlyImpacted, row.names)))
+  sigModule <- omic$dataModule[mostlyImpactedGenes, , drop=F]
+  involved <- moduleMat[mostlyImpactedGenes, , drop=F]
+  
+  list(sigModule=sigModule, discrete=discreteClass, subset=involved, covsConsidered=omic$namesCov)
+}
+
+mostlyMutated <- function(cov, moduleMat, name, eventThr=2) {
+  direction <- gsub(name, "", cov)
+  if (direction == "NEG"){
+    invert=T
+  } else {
+    invert=F
+  }
+  priority <- extractPositivePortion(moduleMat, invert = invert)
+  priority <- colSums(priority >= eventThr, na.rm=T)
+  priority <- data.frame(row.names = names(priority), priority)
+  names(priority) <- cov
+  priority[order(priority[[cov]], decreasing = T),, drop=F]
 }

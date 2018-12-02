@@ -5,7 +5,7 @@
 \title{Compute Omics Intersections}
 \usage{
 computeOmicsIntersections(multiPathwayReportData, pvalueThr = 0.05,
-  zscoreThr = 0.05, resampliThr = NULL, excludeColumns = NULL)
+  zscoreThr = 0.05, resampligThr = NULL, excludeColumns = NULL)
 }
 \arguments{
 \item{multiPathwayReportData}{data.frame, the output of 
@@ -15,7 +15,7 @@ the \code{\link{multiPathwayReport}} or \code{\link{multiPathwayModuleReport}} f
 
 \item{zscoreThr}{numeric indicating the cut-off for covariates coefficients}
 
-\item{resampliThr}{numeric the number of success in the resamplig procedure}
+\item{resampligThr}{numeric the number of success in the resamplig procedure}
 
 \item{excludeColumns}{a vector of characters listing the columns of 
 \code{multiPathwayReportData} object to be excluded by the analysis. 

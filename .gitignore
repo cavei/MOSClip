@@ -1,6 +1,7 @@
-.Rproj.user
+.Rproj.user*
 .Rhistory
 .RData
 .Ruserdata
 .DS*
 MOSClip.Rproj
+.Rproj.user

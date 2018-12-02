@@ -35,3 +35,8 @@ test_that("conversionToSymbols", {
   expect_true(is.null(conversionToSymbols(vec8, "org.Hs.eg.db")))
 })
 
+test_that("extractPositivePortion", {
+  expect_identical(extractPositivePortion(matrix(c(1,1,-1,2), 2)), matrix(c(1,1,0,2),2))
+  expect_identical(extractPositivePortion(matrix(c(1,1,-1,1), 2), invert=T), matrix(c(0,0,1,0),2))
+})
+

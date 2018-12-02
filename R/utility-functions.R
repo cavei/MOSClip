@@ -43,6 +43,9 @@ formatAnnotations <- function(listOfMostlyInvolvedGenesInOmics, sortBy) {
 }
 
 sortAnnotations <- function(annotations, sortBy) {
+  if (is.null(sortBy))
+    return(annotations)
+  
   missing <- setdiff(sortBy, colnames(annotations))
   if (length(missing)!=0)
     stop(paste0(paste(missing, collapse = ", "), ": covariates not found"))
@@ -118,4 +121,15 @@ getContinousPalette <- function(palette, n) {
          yellow = yellowShades(n),
          violet = violetShades(n),
          teal = tealShades(n))
+}
+
+extractPositivePortion <- function(data, invert=FALSE) {
+  .data <- data
+  if (invert) {
+    .data[data > 0] <- 0
+    .data <- abs(.data)
+  } else {
+    .data[data < 0] <- 0
+  }
+  .data
 }

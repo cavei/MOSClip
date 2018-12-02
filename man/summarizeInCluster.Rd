@@ -2,9 +2,10 @@
 % Please edit documentation in R/multiOmicMethods.R
 \name{summarizeInCluster}
 \alias{summarizeInCluster}
-\title{Summarize Using CLuster Analysis}
+\title{Summarize Using Cluster Analysis}
 \usage{
-summarizeInCluster(data, features, name = "clu", cliques = NULL)
+summarizeInCluster(data, features, name = "clu", dictionary = NULL,
+  max_cluster_number = 3, cliques = NULL)
 }
 \arguments{
 \item{data}{a data matrix}
@@ -13,8 +14,16 @@ summarizeInCluster(data, features, name = "clu", cliques = NULL)
 
 \item{name}{prefix of the covariates}
 
-\item{cliques}{the features organized in cliques. Only use for topology.}
+\item{dictionary}{translate features (genes) into sets (row.names of the data)}
+
+\item{max_cluster_number}{the maximum number of cluster to evaluate}
+
+\item{cliques}{the features organized in cliques. Only use for topology}
 }
 \description{
-Given a matrix it summarize to a 0 or 1
+Given a matrix it summarize in classes
+}
+\details{
+The user can define a maximum of classes. The function
+guess the optimal number of clusters using NbClust methods.
 }

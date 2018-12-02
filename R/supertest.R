@@ -175,13 +175,12 @@ stripModulesFromPathways <- function(pathways) {
 #' @importFrom stats na.omit
 #' @export
 #' 
-pvalueSummary <- function(multiPathwayReportData,
-                          excludeColumns=NULL, as.list=FALSE){
+pvalueSummary <- function(multiPathwayReportData, excludeColumns=NULL, as.list=FALSE){
   checkReportFormat(multiPathwayReportData)
   checkColumnsExclusion(multiPathwayReportData, excludeColumns)
   
   columnsNotExcluded <- colnames(multiPathwayReportData)[!(colnames(multiPathwayReportData) %in% excludeColumns)]
-  multiPathwayReportData <- multiPathwayReportData[,columnsNotExcluded]
+  multiPathwayReportData <- multiPathwayReportData[,columnsNotExcluded, drop=F]
   
   
   colClasses <- sapply(multiPathwayReportData, class)
@@ -194,7 +193,7 @@ pvalueSummary <- function(multiPathwayReportData,
   }
   
   covarColumns <- !(colnames(multiPathwayReportData) %in% "pvalue")
-  multiPathwayReportDataSig <- multiPathwayReportData[,covarColumns]
+  multiPathwayReportDataSig <- multiPathwayReportData[,covarColumns, drop=F]
   
   malformedCoulums <- apply(multiPathwayReportDataSig, 2, function(col) any(na.omit(col) > 1 | na.omit(col) < 0))
   
@@ -212,7 +211,8 @@ pvalueSummary <- function(multiPathwayReportData,
   MOlistPval <- tapply(colnames(multiPathwayReportDataSig),
                        covars2omics, 
                        summarizeOmicsResByMinPvalue, 
-                       mat=multiPathwayReportDataSig)
+                       mat=multiPathwayReportDataSig,
+                       simplify = F)
   if (as.list)
     return(MOlistPval)
   do.call(cbind, MOlistPval)
