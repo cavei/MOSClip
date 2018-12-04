@@ -2,10 +2,10 @@
 % Please edit documentation in R/multiOmicMethods.R
 \name{summarizeToNumberOfEvents}
 \alias{summarizeToNumberOfEvents}
-\title{Summarize To Binary Events}
+\title{Summarize To Number of Binary Events}
 \usage{
 summarizeToNumberOfEvents(data, features, name = "event",
-  cliques = NULL)
+  min_prop = 0.1, cliques = NULL)
 }
 \arguments{
 \item{data}{a data matrix}
@@ -13,6 +13,8 @@ summarizeToNumberOfEvents(data, features, name = "event",
 \item{features}{a vector with the features to analyze}
 
 \item{name}{prefix of the covariates}
+
+\item{min_prop}{minimal proportion in classes}
 
 \item{cliques}{the features organized in cliques. Only use for topology.}
 }

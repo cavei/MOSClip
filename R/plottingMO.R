@@ -59,7 +59,7 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
   }
   
   if(length(paletteNames) != length(unique(omics))){
-    stop(paste0("Length of MOcolors differs from the number of omics:", unique(omics)))
+    stop(paste0("Length of MOcolors differs from the number of omics: ", paste(unique(omics), collapse = " ,")))
   }
   
   if (is.null(names(paletteNames)))
@@ -275,7 +275,7 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL,
   }
   
   if(length(paletteNames) != length(unique(omics))){
-    stop(paste0("Length of MOcolors differs from the number of omics:", unique(omics)))
+    stop(paste0("Length of MOcolors differs from the number of omics: ", paste(unique(omics), collapse = ", ")))
   }
   
   if (is.null(names(paletteNames)))
@@ -553,7 +553,7 @@ plotMultiPathwayReport <- function(multiPathwayList, top=25, MOcolors=NULL, ...)
   }
   
   if(length(MOcolors) != length(unique(omics))){
-    stop(paste0("Length of MOcolors differs from the number of omics:", unique(omics)))
+    stop(paste0("Length of MOcolors differs from the number of omics: ", paste(unique(omics), collapse = ", ")))
   }
   
   if (is.null(names(MOcolors)))
@@ -606,7 +606,7 @@ plotModuleReport <- function(pathwayObj, MOcolors=NULL, ...) {
   }
   
   if(length(MOcolors) != length(unique(omics))){
-    stop(paste0("Length of MOcolors differs from the number of omics:", unique(omics)))
+    stop(paste0("Length of MOcolors differs from the number of omics: ", paste(unique(omics), collapse = ", ")))
   }
   
   if (is.null(names(MOcolors)))

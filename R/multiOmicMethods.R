@@ -51,19 +51,20 @@ summarizeToBinaryEvents <- function(data, features, name="bin",
   list(x=collapsed, dataModule=t(dataClique), namesCov=name, method="binary", omicName=name, eventThr=1)
 }
 
-#' Summarize To Binary Events
+#' Summarize To Number of Binary Events
 #'
 #' Given a matrix it summarize to a 0 or 1
 #'
 #' @param data a data matrix
 #' @param features a vector with the features to analyze
 #' @param name prefix of the covariates
+#' @param min_prop minimal proportion in classes
 #' @param cliques the features organized in cliques. Only use for topology.
 #'
 #' @return NULL
 #'
 #' @export
-summarizeToNumberOfEvents <- function(data, features, name="event", cliques=NULL) {
+summarizeToNumberOfEvents <- function(data, features, name="event", min_prop=0.1, cliques=NULL) {
   if (is.null(data))
     return(NULL)
   
@@ -77,13 +78,18 @@ summarizeToNumberOfEvents <- function(data, features, name="event", cliques=NULL
   
   collapsed <- apply(dataClique>0, 1, sum, na.rm=T)
   
-  min <- ceiling(NCOL(data)*0.01)
-  if (sum(collapsed) <  min | (sum(collapsed)) > NROW(dataClique)-min)
+  # min <- ceiling(NCOL(data)*0.01)
+  # if (sum(collapsed) <  min | (sum(collapsed)) > NROW(dataClique)-min)
+  #   return(NULL)
+  
+  keep <- check_minimal_proportion(collapsed, min_prop=min_prop)
+  if (!keep)
     return(NULL)
   
   collapsed <- data.frame(collapsed, row.names = names(collapsed), stringsAsFactors = F)
   colnames(collapsed) <- name
-  list(x=collapsed, dataModule=t(dataClique), namesCov=name, method="count", omicName=name, eventThr = 1)
+  list(x=collapsed, dataModule=t(dataClique), namesCov=name, method="count", omicName=name,
+       eventThr = 1, min_prop=min_prop)
 }
 
 #' Summarize Using Cluster Analysis
@@ -290,13 +296,14 @@ summarizeWithPca <- function(data, features, name="pca", shrink=FALSE, method="r
 #' @param features a vector with the features to analyze
 #' @param name prefix of the covariates
 #' @param eventThr the absolute value to threshold an event
+#' @param min_prop minimal proportion in classes
 #' @param cliques the features organized in cliques. Only use for topology.
 #'
 #' @return NULL
 #'
 #' @export
 summarizeToNumberOfDirectionalEvents <- function(data, features, name="dCount", eventThr=2,
-                                        cliques=NULL) {
+                                        min_prop=0.1, cliques=NULL) {
   if (is.null(data))
     return(NULL)
   
@@ -318,14 +325,29 @@ summarizeToNumberOfDirectionalEvents <- function(data, features, name="dCount", 
                           row.names = names(positive), stringsAsFactors = F)
   colnames(collapsed) <- paste0(name, c("POS","NEG"))
   
-  min <- ceiling(NCOL(data)*0.01)
-  keep <- colSums(collapsed>0) >=  min | colSums(collapsed>0) <= NROW(dataClique)-min
+  # min <- ceiling(NCOL(data)*0.01)
+  # keep <- colSums(collapsed>0) >=  min | colSums(collapsed>0) <= NROW(dataClique)-min
+  keep <- sapply(collapsed, check_minimal_proportion, min_prop=min_prop)
   collapsed = collapsed[, keep, drop=F]
+  
   if (NCOL(collapsed) == 0)
     return(NULL)
   
   list(x=collapsed, dataModule=t(dataClique), namesCov=names(collapsed),
-       method="directedCount", omicName=name, eventThr=eventThr)
+       method="directedCount", omicName=name, eventThr=eventThr, min_prop=min_prop)
+}
+
+#' @importFrom stats quantile
+check_minimal_proportion <- function(x, min_prop=0.1){
+  min <- quantile(x, probs=c(min_prop))
+  max <- quantile(x, probs=c(1-min_prop))
+  if ((min==min(x)) && (max==min(x)))
+    return(FALSE)
+  
+  if ((min==max(x)) && (max==max(x)))
+    return(FALSE)
+  
+  TRUE
 }
 
 #' Summarize To Binary Directional Events

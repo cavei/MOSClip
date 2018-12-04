@@ -88,8 +88,9 @@ KWtest <- function(moduleMat, classes) {
 #'
 #' @param omic a summarized omic
 #' @param moduleCox the coxObj of the interesting module
-#' @param loadThr the thr value to select the most influent features according to the loading.
-#' @param atleast the minimum number of gene to retrieve.
+#' @param loadThr the thr value to select the most influent features according to the loading
+#' @param atleast the minimum number of gene to retrieve
+#' @param minprop the minimal proportion of cutp
 #'
 #' @return summary for omic summarized using clusters
 #' \item{sigModule}{the original data for significant features}
@@ -100,22 +101,28 @@ KWtest <- function(moduleMat, classes) {
 #' @export
 #' 
 
-extractSummaryFromPCA <- function(omic, moduleCox, loadThr=0.6, atleast=1) {
+extractSummaryFromPCA <- function(omic, moduleCox, loadThr=0.6, atleast=1, minprop=0.1) {
   covs <- omic$namesCov
   lds <- omic$loadings
-  discretePC <- createDiscreteClasses(coxObj=moduleCox, covs)
+  discretePC <- createDiscreteClasses(coxObj=moduleCox, covs, minprop=minprop)
   topLoad <- extractHighLoadingsGenes(lds, thr=loadThr, atleast=atleast)
   sigModule <- omic$dataModule[row.names(topLoad), , drop=F]
   list(sigModule=sigModule, discrete=discretePC, subset=topLoad, covsConsidered=covs)
 }
 
 #' @importFrom survminer surv_cutpoint surv_categorize
-createDiscreteClasses <- function(coxObj, covs, labels= c("low", "high")) {
+createDiscreteClasses <- function(coxObj, covs, labels= c("low", "high"), minprop=0.1) {
+         
   diff <- setdiff(covs, colnames(coxObj))
   if (length(diff) != 0) {
     stop(paste0(paste(diff, collapse=", "), " not in coxObj."))
   }
-  sc <- surv_cutpoint(coxObj, time="days", event="status", variables = covs, minprop=0.01)
+  
+  check <- sapply(coxObj[, covs, drop=F], check_minimal_proportion, minprop=minprop)
+  if (any(!check)){
+    stop(paste0("minprop ", minprop, " is too high. Try a smaller one"))
+  }
+  sc <- surv_cutpoint(coxObj, time="days", event="status", variables = covs, minprop=minprop)
   surv_categorize(sc, labels=labels)
 }
 
@@ -148,6 +155,7 @@ collapse <- function(list) {
 #' @param omic a summarized omic
 #' @param moduleCox the coxObj of the interesting module
 #' @param n maximum number of features to retrieve
+#' @param minprop the minimal proportion of cutp
 #'
 #' @return Meant for internal use only. The summary for omic summarized using clusters
 #' \item{sigModule}{the original data for significant features}
@@ -157,10 +165,11 @@ collapse <- function(list) {
 #' \item{covsConsidered}{the name of the considered omic}
 #'
 #' @export
-extractSummaryFromNumberOfEvents <- function(omic, moduleCox, n=3) {
+extractSummaryFromNumberOfEvents <- function(omic, moduleCox, n=3, minprop=0.1) {
   covs <- omic$namesCov
   moduleMat=omic$dataModule
-  discreteClass <- createDiscreteClasses(coxObj=moduleCox, covs, labels=c("norm","apli/del"))
+  discreteClass <- createDiscreteClasses(coxObj=moduleCox, covs, labels=c("norm","apli/del"),
+                                         minprop=minprop)
   impact <- lapply(covs, mostlyMutated, moduleMat=t(omic$dataModule), name=omic$omicName, 
                    eventThr = omic$eventThr)
   mostlyImpacted <- lapply(impact, head, n=n)

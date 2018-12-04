@@ -40,3 +40,13 @@ test_that("extractPositivePortion", {
   expect_identical(extractPositivePortion(matrix(c(1,1,-1,1), 2), invert=T), matrix(c(0,0,1,0),2))
 })
 
+test_that("check_minimal_proportion", {
+  cls <- c(rep(0, 10), rep(1,90))
+  expect_true(check_minimal_proportion(cls, min_prop=0.1))
+  cls[1] <- 1
+  expect_false(check_minimal_proportion(cls, min_prop=0.1))
+  cls <- c(rep(0, 90), rep(20,10))
+  expect_true(check_minimal_proportion(cls, min_prop=0.1))
+  cls[100] <- 0
+  expect_false(check_minimal_proportion(cls, min_prop=0.1))
+})

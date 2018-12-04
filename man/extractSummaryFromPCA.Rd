@@ -4,16 +4,19 @@
 \alias{extractSummaryFromPCA}
 \title{Extract Summary PCA from MultiOmics Objects}
 \usage{
-extractSummaryFromPCA(omic, moduleCox, loadThr = 0.6, atleast = 1)
+extractSummaryFromPCA(omic, moduleCox, loadThr = 0.6, atleast = 1,
+  minprop = 0.1)
 }
 \arguments{
 \item{omic}{a summarized omic}
 
 \item{moduleCox}{the coxObj of the interesting module}
 
-\item{loadThr}{the thr value to select the most influent features according to the loading.}
+\item{loadThr}{the thr value to select the most influent features according to the loading}
 
-\item{atleast}{the minimum number of gene to retrieve.}
+\item{atleast}{the minimum number of gene to retrieve}
+
+\item{minprop}{the minimal proportion of cutp}
 }
 \value{
 summary for omic summarized using clusters

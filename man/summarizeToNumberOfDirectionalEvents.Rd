@@ -5,7 +5,7 @@
 \title{Summarize With Directed Sum}
 \usage{
 summarizeToNumberOfDirectionalEvents(data, features, name = "dCount",
-  eventThr = 2, cliques = NULL)
+  eventThr = 2, min_prop = 0.1, cliques = NULL)
 }
 \arguments{
 \item{data}{a data matrix}
@@ -15,6 +15,8 @@ summarizeToNumberOfDirectionalEvents(data, features, name = "dCount",
 \item{name}{prefix of the covariates}
 
 \item{eventThr}{the absolute value to threshold an event}
+
+\item{min_prop}{minimal proportion in classes}
 
 \item{cliques}{the features organized in cliques. Only use for topology.}
 }
