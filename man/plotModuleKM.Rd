@@ -6,7 +6,8 @@
 \usage{
 plotModuleKM(pathway, moduleNumber, formula = "Surv(days, status) ~ PC1",
   fileName = NULL, paletteNames = NULL, h = 9, w = 7,
-  risk.table = TRUE, pval = TRUE, size = 1, inYears = FALSE)
+  risk.table = TRUE, pval = TRUE, size = 1, inYears = FALSE,
+  discr_prop_pca = 0.15, discr_prop_events = 0.05)
 }
 \arguments{
 \item{pathway}{MultiOmicsModule pathway object}
@@ -30,6 +31,10 @@ plotModuleKM(pathway, moduleNumber, formula = "Surv(days, status) ~ PC1",
 \item{size}{line width of the KM curves}
 
 \item{inYears}{set time in years}
+
+\item{discr_prop_pca}{the minimal proportion to compute the pca classes}
+
+\item{discr_prop_events}{the minimal proportion to compute the event classes}
 }
 \description{
 Given the pathway, it creates the Kaplan-meier curves following the formula.

@@ -83,13 +83,15 @@ filterExpr <- function(exp, samples) {
 #' 
 filterMultiOmicsForSamples <- function(MO, samples) {
   filterData <- lapply(MO@data, function(expr) {
-    if (is.list(expr)) {
+    if (is.matrix(expr) || is.data.frame(expr)) {
+      filterExpr(expr, samples)
+    } else if (is.list(expr)) {
       out <- expr
       exp <- filterExpr(expr[[1]], samples)
       out[[1]] <- exp
       out
     } else {
-      filterExpr(expr, samples)
+      stop("Something wrong 5923")
     }
   })
   MO@data <- filterData

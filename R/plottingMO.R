@@ -14,6 +14,8 @@
 #' @param nrowsHeatmaps magnification respect to annotation of sample (annotations take 1 row)
 #' @param h the height of the plot
 #' @param w the width of the plot
+#' @param discr_prop_pca the minimal proportion to compute the pca classes
+#' @param discr_prop_events the minimal proportion to compute the event classes
 #'
 #' @return NULL
 #' 
@@ -32,11 +34,13 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
                             withSampleNames=TRUE,
                             fontsize_row = 10, fontsize_col = 1,
                             nrowsHeatmaps=3,
-                            h = 9, w=7) {
+                            h = 9, w=7,
+                            discr_prop_pca=0.15, discr_prop_events=0.05) {
   
   checkmate::assertClass(pathway, "MultiOmicsPathway")
   
-  involved <- guessInvolvementPathway(pathway)
+  involved <- guessInvolvementPathway(pathway, min_prop_pca=discr_prop_events,
+                                      min_prop_events=discr_prop_events)
   if(length(paletteNames)!=length(involved)) {
     repTimes <- ceiling(length(involved)/length(paletteNames))
     paletteNames <- rep(paletteNames, repTimes)[seq_along(involved)]
@@ -164,6 +168,8 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
 #' @param pval logical to show pvalue
 #' @param size line width of the KM curves
 #' @param inYears set time in years
+#' @param discr_prop_pca the minimal proportion to compute the pca classes
+#' @param discr_prop_events the minimal proportion to compute the event classes
 #'
 #' @return NULL
 #'
@@ -176,11 +182,13 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
 #' @export
 plotPathwayKM <- function(pathway, formula = "Surv(days, status) ~ PC1",
                           fileName=NULL, paletteNames = NULL,
-                          h = 9, w=7, risk.table=TRUE, pval=TRUE, size=1, inYears=FALSE) {
+                          h = 9, w=7, risk.table=TRUE, pval=TRUE, size=1, inYears=FALSE,
+                          discr_prop_pca=0.15, discr_prop_events=0.05) {
   
   checkmate::assertClass(pathway, "MultiOmicsPathway")
   
-  involved <- guessInvolvementPathway(pathway)
+  involved <- guessInvolvementPathway(pathway,min_prop_pca=discr_prop_events,
+                                      min_prop_events=discr_prop_events)
   annotationFull <- formatAnnotations(involved, sortBy=NULL)
   daysAndStatus <- pathway@coxObj[, c("status", "days"), drop=F]
   
@@ -229,6 +237,8 @@ plotPathwayKM <- function(pathway, formula = "Surv(days, status) ~ PC1",
 #' @param nrowsHeatmaps magnification respect to annotation of sample (annotations take 1 row)
 #' @param h the height of the plot
 #' @param w the width of the plot
+#' @param discr_prop_pca the minimal proportion to compute the pca classes
+#' @param discr_prop_events the minimal proportion to compute the event classes
 #'
 #' @return NULL
 #' @importFrom checkmate assertClass
@@ -246,13 +256,14 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL,
                            withSampleNames=TRUE, 
                            fontsize_row = 10, fontsize_col = 1,
                            nrowsHeatmaps=3,
-                           h = 9, w=7) {
+                           h = 9, w=7, discr_prop_pca=0.15, discr_prop_events=0.05) {
   
   checkmate::assertClass(pathway, "MultiOmicsModules")
   
   moduleGenes <- pathway@modules[[moduleNumber]]
   
-  involved <- guessInvolvement(pathway, moduleNumber = moduleNumber)
+  involved <- guessInvolvement(pathway, moduleNumber = moduleNumber, min_prop_pca=discr_prop_events,
+                               min_prop_events=discr_prop_events)
   
   if(length(paletteNames)!=length(involved)) {
     repTimes <- ceiling(length(involved)/length(paletteNames))
@@ -376,6 +387,8 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL,
 #' @param pval logical to show pvalue
 #' @param size line width of the KM curves
 #' @param inYears set time in years
+#' @param discr_prop_pca the minimal proportion to compute the pca classes
+#' @param discr_prop_events the minimal proportion to compute the event classes
 #'
 #' @return NULL
 #' @importFrom checkmate assertClass
@@ -387,11 +400,13 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL,
 #' @export
 plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ PC1",
                          fileName=NULL, paletteNames=NULL, h = 9, w=7,
-                         risk.table=TRUE, pval=TRUE, size=1, inYears=FALSE) {
+                         risk.table=TRUE, pval=TRUE, size=1, inYears=FALSE,
+                         discr_prop_pca=0.15, discr_prop_events=0.05) {
   
   checkmate::assertClass(pathway, "MultiOmicsModules")
   
-  involved <- guessInvolvement(pathway, moduleNumber = moduleNumber)
+  involved <- guessInvolvement(pathway, moduleNumber = moduleNumber, min_prop_pca=discr_prop_events,
+                               min_prop_events=discr_prop_events)
 
   annotationFull <- formatAnnotations(involved, sortBy=NULL)
   
@@ -438,6 +453,8 @@ plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ 
 #' @param legendLabels set up your favourite names for the omics
 #' @param paletteNames named vector of MOpalettes, names replace makeLegend arguments
 #' @param fileName optional filenames to save the plot
+#' @param discr_prop_pca the minimal proportion to compute the pca classes
+#' @param discr_prop_events the minimal proportion to compute the event classes
 #'
 #' @return NULL
 #' @importFrom checkmate assertClass
@@ -448,7 +465,8 @@ plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ 
 #' 
 #' @export
 plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
-                              paletteNames=NULL, legendLabels=NULL, fileName=NULL) {
+                              paletteNames=NULL, legendLabels=NULL, fileName=NULL,
+                              discr_prop_pca=0.15, discr_prop_events=0.05) {
   
   checkmate::assertClass(pathway, "MultiOmicsModules")
 
@@ -457,7 +475,8 @@ plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
   net <- igraph::simplify(net, remove.multiple = T, remove.loops = T)
   color <- rep("grey", length(V(net)))
   color[names(V(net)) %in% moduleGenes] <- "tomato"
-  involved <- guessInvolvement(pathway, moduleNumber = moduleNumber)
+  involved <- guessInvolvement(pathway, moduleNumber = moduleNumber, min_prop_pca=discr_prop_events,
+                               min_prop_events=discr_prop_events)
   mark.groups=lapply(involved, function(x) {
     row.names(x$subset)
   })

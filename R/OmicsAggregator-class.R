@@ -95,7 +95,13 @@ setMethod("show",
               } else {
                 cat("Arguments:\n")
                 arguments <- sapply(seq_along(object@specificArgs[[i]]), function(argI) {
-                  paste(names(object@specificArgs[[i]])[argI], object@specificArgs[[i]][argI], sep=" :")
+                  values <- object@specificArgs[[i]][[argI]]
+                  if (is.list(values)) {
+                    values <- values[1:2]
+                    values <- paste(paste(names(values), unlist(values), sep=" -> "), collapse = " ,")
+                    values <- paste0(values, " ...")
+                  }
+                  paste(names(object@specificArgs[[i]])[argI], values, sep=" :")
                 })
                 cat(paste(arguments, collapse ="\n"), "\n")
               }

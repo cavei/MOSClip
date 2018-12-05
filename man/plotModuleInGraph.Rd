@@ -5,7 +5,8 @@
 \title{Plot graph of the module by omics}
 \usage{
 plotModuleInGraph(pathway, moduleNumber, orgDbi = "org.Hs.eg.db",
-  paletteNames = NULL, legendLabels = NULL, fileName = NULL)
+  paletteNames = NULL, legendLabels = NULL, fileName = NULL,
+  discr_prop_pca = 0.15, discr_prop_events = 0.05)
 }
 \arguments{
 \item{pathway}{MultiOmicsModule pathway object}
@@ -19,6 +20,10 @@ plotModuleInGraph(pathway, moduleNumber, orgDbi = "org.Hs.eg.db",
 \item{legendLabels}{set up your favourite names for the omics}
 
 \item{fileName}{optional filenames to save the plot}
+
+\item{discr_prop_pca}{the minimal proportion to compute the pca classes}
+
+\item{discr_prop_events}{the minimal proportion to compute the event classes}
 }
 \description{
 Given the pathway, it creates the Kaplan-meier curves following the formula.

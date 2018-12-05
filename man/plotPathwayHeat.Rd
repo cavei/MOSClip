@@ -8,7 +8,7 @@ plotPathwayHeat(pathway, sortBy = NULL, fileName = NULL,
   paletteNames = NULL, additionalAnnotations = NULL,
   additionalPaletteNames = NULL, withSampleNames = TRUE,
   fontsize_row = 10, fontsize_col = 1, nrowsHeatmaps = 3, h = 9,
-  w = 7)
+  w = 7, discr_prop_pca = 0.15, discr_prop_events = 0.05)
 }
 \arguments{
 \item{pathway}{MultiOmicsPathway pathway object}
@@ -34,6 +34,10 @@ plotPathwayHeat(pathway, sortBy = NULL, fileName = NULL,
 \item{h}{the height of the plot}
 
 \item{w}{the width of the plot}
+
+\item{discr_prop_pca}{the minimal proportion to compute the pca classes}
+
+\item{discr_prop_events}{the minimal proportion to compute the event classes}
 }
 \description{
 Given the pathway, it creates the heatmaps of the mostly involved genes for each omic.

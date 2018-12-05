@@ -50,3 +50,18 @@ test_that("check_minimal_proportion", {
   cls[100] <- 0
   expect_false(check_minimal_proportion(cls, min_prop=0.1))
 })
+
+
+ex <- matrix(1:100, 10, 10,dimnames = list(letters[1:10], LETTERS[1:10]))
+MO <- MOSClip::Omics(data=list(e=ex,
+                               df=as.data.frame(ex)),
+                     methods=c("summarizeWithPca", "summarizeWithPca"))
+MO_err <- MOSClip::Omics(data=list(e=as.character(ex)), 
+                         methods=c("summarizeWithPca"))
+smallMO <- MOSClip:::filterMultiOmicsForSamples(MO, c("A"))
+
+test_that("filterMultiOmicsForSamples", {
+  expect_identical(smallMO@data[[1]], as.matrix(smallMO@data[[2]]))
+  expect_error(filterMultiOmicsForSamples(MO, c("Z")))
+  expect_error(filterMultiOmicsForSamples(MO_err, c("A")))
+})

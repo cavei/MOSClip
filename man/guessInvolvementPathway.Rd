@@ -4,7 +4,8 @@
 \alias{guessInvolvementPathway}
 \title{Guess the most influent features from MultiOmics Survival Results.}
 \usage{
-guessInvolvementPathway(pathway, loadThr = 0.6, n = 3, atleast = 1)
+guessInvolvementPathway(pathway, loadThr = 0.6, n = 3, atleast = 1,
+  min_prop_pca = 0.1, min_prop_events = 0.1)
 }
 \arguments{
 \item{pathway}{MultiOmicsPathway from a pathway.}
@@ -14,6 +15,10 @@ guessInvolvementPathway(pathway, loadThr = 0.6, n = 3, atleast = 1)
 \item{n}{the maximum number of genes to retrive (cluster and binary only)}
 
 \item{atleast}{the minimum number of features to select (PCA only)}
+
+\item{min_prop_pca}{the minimal proportion to compute the pca classes}
+
+\item{min_prop_events}{the minimal proportion to compute the event classes}
 }
 \value{
 For each omic analyzed a list that is the summary for omic summarized using the setted method: pvalues are present only for cluster method.

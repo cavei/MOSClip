@@ -118,7 +118,7 @@ createDiscreteClasses <- function(coxObj, covs, labels= c("low", "high"), minpro
     stop(paste0(paste(diff, collapse=", "), " not in coxObj."))
   }
   
-  check <- sapply(coxObj[, covs, drop=F], check_minimal_proportion, minprop=minprop)
+  check <- sapply(coxObj[, covs, drop=F], check_minimal_proportion, min_prop=minprop)
   if (any(!check)){
     stop(paste0("minprop ", minprop, " is too high. Try a smaller one"))
   }
