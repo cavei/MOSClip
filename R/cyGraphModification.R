@@ -35,7 +35,6 @@ plotGraphiteInCy <- function (graph, nattributes, main="network") {
   }
 }
 
-#' @importFrom RCy3 initNodeAttribute
 #' @importFrom graph nodeData
 addNodeAttributesToGraphNEL <- function(graph, attributes) {
   g <- graph
