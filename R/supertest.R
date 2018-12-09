@@ -165,6 +165,42 @@ stripModulesFromPathways <- function(pathways) {
   sub("\\.[0-9]+", "",pathways, perl=T)
 }
 
+#' Remove pathways with no id in graphite
+#' 
+#' This function id risky to use. It performs pairing without
+#' checking proper pairs.
+#' 
+#' @param omicClass the name of an omic class (or omic combination)
+#' @param omicsClasses2pathways vector of pathway names
+#' @param omicsClasses2fathers vector of pathway names
+#' 
+#' @return data frame 
+#' 
+#' @export
+#' 
+match_pathway_to_fathers <- function(omicClass, omicsClasses2pathways, omicsClasses2fathers) {
+  if (!(omicClass %in% names(omicsClasses2pathways)))
+    stop(paste0("Omic not found in class2pathways:", omicClass))
+  if (!(omicClass %in% names(omicsClasses2fathers)))
+    stop(paste0("Omic not found in class2pathways:", omicClass))
+  
+  if (is.null(omicsClasses2fathers[[omicClass]])){
+    valid_set=character()
+  } else {
+    valid_set <- intersect(omicsClasses2pathways[[omicClass]], omicsClasses2fathers[[omicClass]])
+  }
+  leave_out <- setdiff(omicsClasses2pathways[[omicClass]], valid_set)
+  if (length(leave_out)>0)
+    warning(paste0("the following pathway were excluded becuase no id was found; ", paste(leave_out, collapse = ", ")))
+  
+  select_path <- omicsClasses2pathways[[omicClass]] %in% valid_set
+  select_father <- omicsClasses2fathers[[omicClass]] %in% valid_set
+  data.frame(path=omicsClasses2pathways[[omicClass]][select_path], 
+             father=omicsClasses2fathers[[omicClass]][select_father],
+             stringsAsFactors = F)
+}
+
+
 #' Compute pvalue Summary
 #' 
 #' @inheritParams runSupertest
