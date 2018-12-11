@@ -475,7 +475,7 @@ plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
   net <- igraph::simplify(net, remove.multiple = T, remove.loops = T)
   color <- rep("grey", length(V(net)))
   color[names(V(net)) %in% moduleGenes] <- "tomato"
-  involved <- guessInvolvement(pathway, moduleNumber = moduleNumber, min_prop_pca=discr_prop_events,
+  involved <- guessInvolvement(pathway, moduleNumber = moduleNumber,min_prop_pca=discr_prop_events,
                                min_prop_events=discr_prop_events)
   mark.groups=lapply(involved, function(x) {
     row.names(x$subset)

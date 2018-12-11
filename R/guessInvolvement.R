@@ -25,13 +25,13 @@ guessInvolvement <- function(pathway, moduleNumber, loadThr=0.6, n=3, atleast=1,
 
   lapply(omics, function(omic) {
     if(omic$method=="pca") {
-      extractSummaryFromPCA(omic, moduleCox, loadThr, atleast)
+      extractSummaryFromPCA(omic, moduleCox, loadThr, atleast, minprop=min_prop_pca)
     } else if (omic$method=="cluster") {
       extractSummaryFromCluster(omic, n)
     } else if (omic$method %in% c("binary", "directedBinary")) {
       extractSummaryFromBinary(omic, n)
     } else if (omic$method %in% c("count", "directedCount")) {
-      extractSummaryFromNumberOfEvents(omic, moduleCox, n=3)
+      extractSummaryFromNumberOfEvents(omic, moduleCox, n=3, minprop=min_prop_events)
     } else {
       stop("Unsupported method.")
     }
