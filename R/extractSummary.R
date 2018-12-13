@@ -156,6 +156,7 @@ collapse <- function(list) {
 #' @param moduleCox the coxObj of the interesting module
 #' @param n maximum number of features to retrieve
 #' @param minprop the minimal proportion of cutp
+#' @param labels the category labels
 #'
 #' @return Meant for internal use only. The summary for omic summarized using clusters
 #' \item{sigModule}{the original data for significant features}
@@ -165,10 +166,10 @@ collapse <- function(list) {
 #' \item{covsConsidered}{the name of the considered omic}
 #'
 #' @export
-extractSummaryFromNumberOfEvents <- function(omic, moduleCox, n=3, minprop=0.1) {
+extractSummaryFromNumberOfEvents <- function(omic, moduleCox, n=3, minprop=0.1, labels=c("few","many")) {
   covs <- omic$namesCov
   moduleMat=omic$dataModule
-  discreteClass <- createDiscreteClasses(coxObj=moduleCox, covs, labels=c("norm","apli/del"),
+  discreteClass <- createDiscreteClasses(coxObj=moduleCox, covs, labels=labels,
                                          minprop=minprop)
   impact <- lapply(covs, mostlyMutated, moduleMat=t(omic$dataModule), name=omic$omicName, 
                    eventThr = omic$eventThr)

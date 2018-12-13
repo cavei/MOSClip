@@ -4,7 +4,8 @@
 \alias{extractSummaryFromNumberOfEvents}
 \title{Extract Summary Binary from MultiOmics Objects}
 \usage{
-extractSummaryFromNumberOfEvents(omic, moduleCox, n = 3, minprop = 0.1)
+extractSummaryFromNumberOfEvents(omic, moduleCox, n = 3, minprop = 0.1,
+  labels = c("few", "many"))
 }
 \arguments{
 \item{omic}{a summarized omic}
@@ -14,6 +15,8 @@ extractSummaryFromNumberOfEvents(omic, moduleCox, n = 3, minprop = 0.1)
 \item{n}{maximum number of features to retrieve}
 
 \item{minprop}{the minimal proportion of cutp}
+
+\item{labels}{the category labels}
 }
 \value{
 Meant for internal use only. The summary for omic summarized using clusters
