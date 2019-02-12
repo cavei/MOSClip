@@ -5,7 +5,7 @@
 \title{Multi Omics Module Inter Module Analysis}
 \usage{
 multiOmicsModuleInterAnalysis(moduleSummary, momTestObj,
-  zscoreThr = 0.05)
+  zscoreThr = 0.05, min_prop_pca = 0.15, min_prop_events = 0.05)
 }
 \arguments{
 \item{moduleSummary}{the table that summarized the module results}
@@ -13,6 +13,10 @@ multiOmicsModuleInterAnalysis(moduleSummary, momTestObj,
 \item{momTestObj}{the list of MOM results}
 
 \item{zscoreThr}{significance threshold}
+
+\item{min_prop_pca}{the minimal proportion to compute the pca classes}
+
+\item{min_prop_events}{the minimal proportion to compute the event classes}
 }
 \value{
 a list

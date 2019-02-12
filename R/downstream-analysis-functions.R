@@ -87,6 +87,8 @@ summarizeColumnsByMask <- function(table, mask, thr=0.05) {
 #' @param moduleSummary the table that summarized the module results
 #' @param momTestObj the list of MOM results
 #' @param zscoreThr significance threshold
+#' @param min_prop_pca the minimal proportion to compute the pca classes
+#' @param min_prop_events the minimal proportion to compute the event classes
 #'
 #' @return a list
 #' \item{sigOmicsPart}{for each Omic the significant}
@@ -94,7 +96,10 @@ summarizeColumnsByMask <- function(table, mask, thr=0.05) {
 #' \item{allGenes}{the genes used}
 #'
 #' @export
-multiOmicsModuleInterAnalysis <- function(moduleSummary, momTestObj, zscoreThr=0.05) {
+multiOmicsModuleInterAnalysis <- function(moduleSummary, momTestObj, zscoreThr=0.05,
+                                          min_prop_pca=0.15, min_prop_events=0.05) {
+  # moduleSummary <- moduleSummary.sig
+  # momTestObj <- MOM
   
   summary <- pvalueSummary(moduleSummary, excludeColumns = c("pathway", "module"))
   
@@ -103,34 +108,99 @@ multiOmicsModuleInterAnalysis <- function(moduleSummary, momTestObj, zscoreThr=0
   sigMask <- na2false(summary <= zscoreThr)
   
   sig <- lapply(seq_along(pathway), function(i){
-    involvment <- guessInvolvement(momTestObj[[pathway[i]]], moduleNumber[i])
-    involvment[!sigMask[i, ]] <- NA
+    involvment <- guessInvolvement(momTestObj[[pathway[i]]], moduleNumber[i],
+                                   min_prop_pca=min_prop_pca,
+                                   min_prop_events=min_prop_events)
+    omicNames <- sapply(involvment, function(xx) unique(guessOmics(xx$covsConsidered)))
+    involvment[!sigMask[i, omicNames]] <- NA
+    names(involvment) <- omicNames
+    # involvemet$coxObj <- momTestObj[[pathway[i]]]@coxObjs[[moduleNumber[i]]]
     involvment
   })
   
-  cumulativeMut <- lapply(sig, extractMutationsCumulativeProfiles)
+  names(sig) <- paste0(pathway,'.',moduleNumber)
+  
+  ## A carefull check is needed.
+  # cumulativeMut <- lapply(sig, extractMutationsCumulativeProfiles)
+  cumulativeMut <- lapply(sig, extractEventsProfiles, omicName="mut")
+  cumulativeCnv <- lapply(sig, extractEventsProfiles, omicName="cnv")
+  
   names(cumulativeMut) <- paste0(pathway,'.',moduleNumber)
+  names(cumulativeCnv) <- paste0(pathway,'.',moduleNumber)
+  
+  numericMut <- lapply(sig, extractEventsNumeric, omicName="mut")
+  numericCnv <- lapply(sig, extractEventsNumeric, omicName="cnv")
+  
+  names(numericMut) <- paste0(pathway,'.',moduleNumber)
+  names(numericCnv) <- paste0(pathway,'.',moduleNumber)
+  
+  genesMut <- lapply(sig, extractEventsGenes, omicName="mut")
+  genesCnv <- lapply(sig, extractEventsGenes, omicName="cnv")
+  
+  names(genesMut) <- paste0(pathway,'.',moduleNumber)
+  names(genesCnv) <- paste0(pathway,'.',moduleNumber)
   
   # estraggo tutti i geni che appartengono ai moduli
   modulesGenes <- unique(unlist(lapply(seq_along(pathway), function(i){
     momTestObj[[pathway[i]]]@modules[[moduleNumber[i]]]
   })))
   
+  # omicNames <- colnames(sigMask)
+  # byOmicsSig <- lapply(seq_along(omicNames), function(i) {
+  #   omic <- lapply(sig, function(pathModule){
+  #     if(all(is.na(pathModule[[i]])))
+  #       return(NULL)
+  #     pathModule[[i]]$sigModule
+  #   })
+  #   omic <- unique(do.call(rbind, omic))
+  #   if (!is.null(omic)) {
+  #     row.names(omic) <- paste0(omicNames[i],".",row.names(omic))
+  #   }
+  #   omic
+  # })
   omicNames <- colnames(sigMask)
-  byOmicsSig <- lapply(seq_along(omicNames), function(i) {
-    omic <- lapply(sig, function(pathModule){
-      if(all(is.na(pathModule[[i]])))
-        return(NULL)
-      pathModule[[i]]$sigModule
+  byOmicsSig <- lapply(omicNames, function(on) {
+    omic <- lapply(seq_along(sig), function(n){
+      pathwModule<-sig[[n]]
+      if (on %in% names(pathwModule)) {
+        if (all(is.na(pathwModule[[on]])))
+          return(NULL)
+        pathwModule[[on]]$sigModule
+      }
     })
-    omic <- unique(do.call(rbind, omic))
+    # grep("9636", unique(do.call(c, sapply(omic, row.names))))
+    
+    omicRep <- do.call(rbind, omic)
+    omic <- makeUniqueRowNamesMatrix(omicRep)
     if (!is.null(omic)) {
-      row.names(omic) <- paste0(omicNames[i],".",row.names(omic))
+      row.names(omic) <- paste0(on,".",row.names(omic))
     }
     omic
   })
   names(byOmicsSig) <- omicNames
-  list(sigOmicsPart=byOmicsSig, pvaluesSummary=summary, allGenes=modulesGenes, cumulativeMutProfiles=cumulativeMut)
+  list(sigOmicsPart=byOmicsSig, pvaluesSummary=summary, allGenes=modulesGenes,
+       cumulativeMutProfiles=cumulativeMut,
+       cumulativeCnvProfiles=cumulativeCnv,
+       numericMutProfiles=numericMut,
+       numericCnvProfiles=numericCnv,
+       mutGenes=genesMut, cnvGenes=genesCnv)
+}
+
+
+makeUniqueRowNamesMatrix <- function(duplRowNamesMatrix){
+  if (is.null(row.names(duplRowNamesMatrix)))
+    stop("row.names of the duplRowNamesMatrix are null. Use Unique")
+  
+  duplRowNamesMatrix.1 <- cbind(names=row.names(duplRowNamesMatrix), duplRowNamesMatrix)
+  uMatrix <- unique(duplRowNamesMatrix.1)
+  rn <- uMatrix[,1]
+  uMatrix <- uMatrix[, -c(1), drop=F]
+  
+  numericCols <- apply(duplRowNamesMatrix,2,is.numeric)
+  if (all(numericCols))
+    uMatrix <- apply(uMatrix, 2 , as.numeric)
+  row.names(uMatrix) <- rn
+  uMatrix
 }
 
 extractMutationsCumulativeProfiles <- function(paths, omicName="mut") {
@@ -149,6 +219,30 @@ extractMutationsCumulativeProfiles <- function(paths, omicName="mut") {
       profiles
     }
     
+}
+
+extractEventsProfiles <- function(module, omicName="mut") {
+  if (omicName %in% names(module)) {
+    if (all(is.na(module[[omicName]])))
+      return(NULL)
+    module[[omicName]]$discrete
+  }
+}
+
+extractEventsNumeric <- function(module, omicName="mut") {
+  if (omicName %in% names(module)) {
+    if (all(is.na(module[[omicName]])))
+      return(NULL)
+    module[[omicName]]$numericClass
+  }
+}
+
+extractEventsGenes <- function(module, omicName="mut") {
+  if (omicName %in% names(module)) {
+    if (all(is.na(module[[omicName]])))
+      return(NULL)
+    module[[omicName]]$subset
+  }
 }
 
 #' Extract the worst profile

@@ -50,6 +50,9 @@ addNodeAttributesToGraphNEL <- function(graph, attributes) {
 #'
 #' @param coxObj cox like object with days and status plus covariates
 #' @param covs the covariates to use
+#' @param doChecks if TRUE perform checks on min proportion
+#' @param labels the labels of the two classes
+#' @param minprop minimal proportion
 #'
 #' @return discrete version of the selected 'covs'. 
 #' 
@@ -57,13 +60,21 @@ addNodeAttributesToGraphNEL <- function(graph, attributes) {
 #' @importFrom survminer surv_cutpoint surv_categorize
 #' @export
 #' 
-createBiClasses <- function(coxObj, covs) {
+createBiClasses <- function(coxObj, covs, doChecks=TRUE, labels= c("low", "high"), minprop=0.1) {
+  
   diff <- setdiff(covs, colnames(coxObj))
   if (length(diff) != 0) {
     stop(paste0(paste(diff, collapse=", "), " not in coxObj."))
   }
-  sc <- survminer::surv_cutpoint(coxObj, time="days", event="status", variables = covs)
-  survminer::surv_categorize(sc)
+  
+  if (doChecks){
+    check <- sapply(coxObj[, covs, drop=F], check_minimal_proportion, min_prop=minprop)
+    if (any(!check)){
+      stop(paste0("minprop ", minprop, " is too high. Try a smaller one"))
+    }
+  }
+  sc <- surv_cutpoint(coxObj, time="days", event="status", variables = covs, minprop=minprop, progressbar = FALSE)
+  surv_categorize(sc, labels=labels)
 }
 
 #' Create a binary look for discrete classes.

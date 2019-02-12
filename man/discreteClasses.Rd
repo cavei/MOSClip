@@ -6,7 +6,8 @@
 \alias{keepFirstOccurrence}
 \title{From continous to discrete classes.}
 \usage{
-createBiClasses(coxObj, covs)
+createBiClasses(coxObj, covs, doChecks = TRUE, labels = c("low",
+  "high"), minprop = 0.1)
 
 createBinaryMatrix(discrete, markAs1 = c("high", "TRUE"))
 
@@ -16,6 +17,12 @@ keepFirstOccurrence(m, whichCol)
 \item{coxObj}{cox like object with days and status plus covariates}
 
 \item{covs}{the covariates to use}
+
+\item{doChecks}{if TRUE perform checks on min proportion}
+
+\item{labels}{the labels of the two classes}
+
+\item{minprop}{minimal proportion}
 
 \item{discrete}{discrete version of the covariates (columns)}
 
