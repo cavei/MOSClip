@@ -17,5 +17,5 @@ devtools::install_github("cavei/MOSClip")
 from your R prompt.
 
 
-Please follow this [tutorial](https://cavei.github.io/). The tutorial reproduce the analysis performed by MOSClip in the TCGA Ovarian Cancer dataset. You can download the initial dataset [here](https://github.com/cavei/example-datasets).
+Please follow this [tutorial](https://cavei.github.io/MOSClipTutorials/). The tutorial reproduce the analysis performed by MOSClip in the TCGA Ovarian Cancer dataset. You can download the initial dataset [here](https://cavei.github.io/example-datasets/).
 
