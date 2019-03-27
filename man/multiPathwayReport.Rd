@@ -4,10 +4,12 @@
 \alias{multiPathwayReport}
 \title{Summarize pathways' info from a list of MultiOmicsPathway (MOP)}
 \usage{
-multiPathwayReport(multiPathwayList)
+multiPathwayReport(multiPathwayList, priority_to = NULL)
 }
 \arguments{
 \item{multiPathwayList}{MultiOmicsPathway pathway object list}
+
+\item{priority_to}{a vector with the covariates (omic name) that should go first}
 }
 \value{
 a data.frame with overal pvalue of the coxph, followed by covariates zs.

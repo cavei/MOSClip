@@ -4,10 +4,12 @@
 \alias{multiPathwayModuleReport}
 \title{Provide a data.frame of pathways module test results from list of Multi Omics Module (MOM) objects}
 \usage{
-multiPathwayModuleReport(multiPathwayModuleList)
+multiPathwayModuleReport(multiPathwayModuleList, priority_to = NULL)
 }
 \arguments{
 \item{multiPathwayModuleList}{a list of Multi Omics Modules resulting from a multi-omics module test.}
+
+\item{priority_to}{a vector with the covariates (omic name) that should go first}
 }
 \value{
 a data.frame, modules in rows, overall and covariate pvalues of the test in columns.

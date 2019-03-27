@@ -4,16 +4,17 @@
 \alias{multiOmicsSurvivalModuleTest}
 \title{Compute Multi Omics Survival in Pathway Modules}
 \usage{
-multiOmicsSurvivalModuleTest(omicsObj, graph, daysStatus,
+multiOmicsSurvivalModuleTest(omicsObj, graph, annot,
   survFormula = "Surv(days, status) ~", autoCompleteFormula = T,
-  useThisGenes = NULL, pathName = NULL, robust = FALSE)
+  useThisGenes = NULL, pathName = NULL, robust = FALSE,
+  include_from_annot = F)
 }
 \arguments{
 \item{omicsObj}{Object of class 'Omics'}
 
 \item{graph}{a pathway in graphNEL, Pathway or geneset format.}
 
-\item{daysStatus}{survival annotation: days and status (0,1). Row.names are samples}
+\item{annot}{survival annotation: days and status (0,1). Row.names are samples. Additional covariates can be passed as columns (use include_from_annot).}
 
 \item{survFormula}{Formula to compute survival}
 
@@ -24,6 +25,8 @@ multiOmicsSurvivalModuleTest(omicsObj, graph, daysStatus,
 \item{pathName}{title of the pathway. If NULL and graph is "Pathway" graph@title is used as title}
 
 \item{robust}{should be used the robust mode for cox}
+
+\item{include_from_annot}{compute cox using additional covariates from annot}
 }
 \value{
 MultiOmicsModules object

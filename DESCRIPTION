@@ -1,7 +1,7 @@
 Package: MOSClip
 Type: Package
 Title: Multi Omics Survival Clip
-Version: 0.3.4
+Version: 0.4.1
 Author: Paolo Martini
 Maintainer: Paolo Martini <paolo.martini@unipd.it>
 Description: Allows to combine multiple omics dimension to perform pathway survival analysis. There are two main mode: multiOmicsSurvivalPathwayTest and muoltiOmicsSurvivalModuleTest. The latter method allows the user to dig inside the pathways itself.

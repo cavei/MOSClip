@@ -170,6 +170,8 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
 #' @param inYears set time in years
 #' @param discr_prop_pca the minimal proportion to compute the pca classes
 #' @param discr_prop_events the minimal proportion to compute the event classes
+#' @param additional_discrete names of the additional discrete variables to include
+#' @param additional_continous names of the additional continous variables to include
 #'
 #' @return NULL
 #'
@@ -183,7 +185,9 @@ plotPathwayHeat <- function(pathway, sortBy=NULL, fileName=NULL,
 plotPathwayKM <- function(pathway, formula = "Surv(days, status) ~ PC1",
                           fileName=NULL, paletteNames = NULL,
                           h = 9, w=7, risk.table=TRUE, pval=TRUE, size=1, inYears=FALSE,
-                          discr_prop_pca=0.15, discr_prop_events=0.05) {
+                          discr_prop_pca=0.15, discr_prop_events=0.05,
+                          additional_discrete=NULL,
+                          additional_continous=NULL) {
   
   checkmate::assertClass(pathway, "MultiOmicsPathway")
   
@@ -389,6 +393,8 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL,
 #' @param inYears set time in years
 #' @param discr_prop_pca the minimal proportion to compute the pca classes
 #' @param discr_prop_events the minimal proportion to compute the event classes
+#' @param additional_discrete names of the additional discrete variables to include
+#' @param additional_continous names of the additional continous variables to include
 #'
 #' @return NULL
 #' @importFrom checkmate assertClass
@@ -401,7 +407,9 @@ plotModuleHeat <- function(pathway, moduleNumber, sortBy=NULL,
 plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ PC1",
                          fileName=NULL, paletteNames=NULL, h = 9, w=7,
                          risk.table=TRUE, pval=TRUE, size=1, inYears=FALSE,
-                         discr_prop_pca=0.15, discr_prop_events=0.05) {
+                         discr_prop_pca=0.15, discr_prop_events=0.05,
+                         additional_discrete=NULL,
+                         additional_continous=NULL) {
   
   checkmate::assertClass(pathway, "MultiOmicsModules")
   
@@ -410,12 +418,48 @@ plotModuleKM <- function(pathway, moduleNumber, formula = "Surv(days, status) ~ 
 
   annotationFull <- formatAnnotations(involved, sortBy=NULL)
   
-  daysAndStatus <- pathway@coxObjs[[moduleNumber]][, c("status", "days"), drop=F]
+  days_status_names <- c("status", "days")
+  
+  daysAndStatus <- pathway@coxObjs[[moduleNumber]][, days_status_names, drop=F]
   if (inYears)
     daysAndStatus$days <- daysAndStatus$days/365.24
   
-  coxObj <- data.frame(daysAndStatus, annotationFull[row.names(daysAndStatus), , drop=F])
-
+  additional_clinic = NULL
+  if (!is.null(additional_discrete)){
+    not_found <- setdiff(additional_discrete, colnames(pathway@coxObjs[[moduleNumber]]))
+    if (length(not_found) > 0)
+      stop(paste0("Some discrete variables were not found: ", paste(not_found, collapse = ", ", "\n"),
+                  "We found the following variables: ", paste(colnames(pathway@coxObjs[[moduleNumber]]),
+                                                              collapse = ", ")))
+    
+    fixed_covs <- setdiff(additional_discrete, colnames(annotationFull))
+    additional_clinic <- pathway@coxObjs[[moduleNumber]][row.names(daysAndStatus), fixed_covs, drop=F]
+  }
+  
+  if (!is.null(additional_continous)){
+    not_found <- setdiff(additional_continous, colnames(pathway@coxObjs[[moduleNumber]]))
+    if (length(not_found) > 0)
+      stop(paste0("Some continous variables were not found: ", paste(not_found, collapse = ", ", "\n"),
+                  "We found the following variables: ", paste(colnames(pathway@coxObjs[[moduleNumber]]),
+                                                              collapse = ", ")))
+    
+    fixed_covs <- setdiff(additional_continous, colnames(annotationFull))
+    df <- cbind(daysAndStatus, pathway@coxObjs[[moduleNumber]][row.names(daysAndStatus), fixed_covs, drop=F])
+    discretized_covs <- createDiscreteClasses(df, fixed_covs)
+    
+    if (!is.null(additional_clinic)){
+      additional_clinic <- cbind(additional_clinic, discretized_covs[, fixed_covs, drop=F])
+    } else {
+      additional_clinic <- discretized_covs[, fixed_covs, drop=F]
+    }
+  }
+  
+  if (is.null(additional_clinic)){
+    coxObj <- data.frame(daysAndStatus, annotationFull[row.names(daysAndStatus), , drop=F])
+  } else {
+    coxObj <- data.frame(daysAndStatus, annotationFull[row.names(daysAndStatus), , drop=F], additional_clinic)
+  }
+  
   fit <- survminer::surv_fit(formula(formula), data = coxObj)
   
   palette=NULL
@@ -547,6 +591,7 @@ plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
 #' @param top use top number of pathways
 #' @param MOcolors character vector with the omic colors.
 #' The colors should be among the colors in \code{showMOSpalette()}
+#' @param priority_to a vector with the covariates (omic name) that should go first
 #' @param \dots additional argument to be passed to pheatmap
 #' 
 #'
@@ -555,16 +600,22 @@ plotModuleInGraph <- function(pathway, moduleNumber, orgDbi="org.Hs.eg.db",
 #' @importFrom pheatmap pheatmap
 #' 
 #' @export
-plotMultiPathwayReport <- function(multiPathwayList, top=25, MOcolors=NULL, ...){
+plotMultiPathwayReport <- function(multiPathwayList, top=25, MOcolors=NULL, priority_to=NULL, ...){
   if(!is.list(multiPathwayList))
     stop("multiPathwayList must be a list.")
   
   summary <- multiPathwayReport(multiPathwayList)
+  
   top <- min(top, NROW(summary))
   
   annCol <- guessOmics(colnames(summary))
   # sub("(PC[0-9]+|[23]k[123]|TRUE|FALSE)$","", colnames(summary), perl=TRUE,ignore.case=FALSE)
   omics <- annCol[2:length(annCol)]
+  
+  if (is.null(priority_to) & (!is.null(MOcolors))){
+    if (!is.null(names(MOcolors)))
+      priority_to = names(MOcolors)
+  }
   
   if(is.null(MOcolors)){
     # MOcolors <- names(MOSpalette)[1:length(unique(omics))]
@@ -578,7 +629,9 @@ plotMultiPathwayReport <- function(multiPathwayList, top=25, MOcolors=NULL, ...)
   if (is.null(names(MOcolors)))
     names(MOcolors) <- unique(omics)
   
-  colors <- c(NA, sapply(unique(omics), function(o) MOSpalette[MOcolors[o]]))
+  # colors <- c(NA, sapply(unique(omics), function(o) MOSpalette[MOcolors[o]]))
+  colors <- c(NA, createColors(omics, MOcolors))
+  
   names(colors) <- unique(annCol)
               
   ann_columns <- data.frame(omics = factor(annCol))
@@ -591,6 +644,8 @@ plotMultiPathwayReport <- function(multiPathwayList, top=25, MOcolors=NULL, ...)
                                    gaps_col = c(1), fontsize_row=5, fontsize_col = 7,
                                    annotation_col = ann_columns, annotation_colors = ann_colors,
                                    border_color="white"))
+  
+  summary <- order_by_covariates(summary, 1, priority_to)
   
   args$mat <- summary[seq_len(top),,drop=F]
   do.call(pheatmap, args)
@@ -610,14 +665,21 @@ plotMultiPathwayReport <- function(multiPathwayList, top=25, MOcolors=NULL, ...)
 #' @importFrom grDevices colorRampPalette
 #' @importFrom RColorBrewer brewer.pal
 #' @export
-plotModuleReport <- function(pathwayObj, MOcolors=NULL, ...) {
+plotModuleReport <- function(pathwayObj, MOcolors=NULL, priority_to=NULL, ...) {
   
   checkmate::assertClass(pathwayObj, "MultiOmicsModules")
   
   summary <- formatModuleReport(pathwayObj)
+  
   annCol <- guessOmics(colnames(summary))
   # sub("(PC[0-9]+|[23]k[123]|TRUE|FALSE)$","", colnames(summary), perl=TRUE,ignore.case=FALSE)
   omics <- annCol[2:length(annCol)]
+  
+  if (is.null(priority_to) & (!is.null(MOcolors))){
+    if (!is.null(names(MOcolors)))
+      priority_to = names(MOcolors)
+  }
+  
   
   if(is.null(MOcolors)){
     # MOcolors <- names(MOSpalette)[1:length(unique(omics))]
@@ -631,10 +693,12 @@ plotModuleReport <- function(pathwayObj, MOcolors=NULL, ...) {
   if (is.null(names(MOcolors)))
     names(MOcolors) <- unique(omics)
   
-  colors <- c(NA, sapply(unique(omics), function(o) MOSpalette[MOcolors[o]]))
+  # colors <- c(NA, sapply(unique(omics), function(o) MOSpalette[MOcolors[o]]))
+  colors <- c(NA, createColors(omics, MOcolors))
+  
   names(colors) <- unique(annCol)
   
-  ann_columns <- data.frame(omics = factor(annCol))
+  ann_columns <- data.frame(omics = factor(annCol, levels=unique(annCol)))
   rownames(ann_columns) <- colnames(summary)
   
   ann_colors <- list(omics = colors)
@@ -645,6 +709,7 @@ plotModuleReport <- function(pathwayObj, MOcolors=NULL, ...) {
                                     annotation_col = ann_columns, annotation_colors = ann_colors,
                                     border_color="white"))
   
+  summary <- order_by_covariates(summary, 1, priority_to)
   args$mat <- summary
   do.call(pheatmap, args)
 }

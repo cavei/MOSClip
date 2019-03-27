@@ -5,7 +5,7 @@
 \title{Summarize and plot pathways' info from a list of MultiOmicsPathway (MOP)}
 \usage{
 plotMultiPathwayReport(multiPathwayList, top = 25, MOcolors = NULL,
-  ...)
+  priority_to = NULL, ...)
 }
 \arguments{
 \item{multiPathwayList}{MultiOmicsPathway list pathway object}
@@ -14,6 +14,8 @@ plotMultiPathwayReport(multiPathwayList, top = 25, MOcolors = NULL,
 
 \item{MOcolors}{character vector with the omic colors.
 The colors should be among the colors in \code{showMOSpalette()}}
+
+\item{priority_to}{a vector with the covariates (omic name) that should go first}
 
 \item{\dots}{additional argument to be passed to pheatmap}
 }

@@ -96,9 +96,24 @@ guessOmics <- function(covs) {
 
 guessOmicsColors <- function(omics) {
   uomics <- unique(omics)
-  MOcols <- names(MOSpalette)[seq_along(uomics)]
+  if (length(uomics) < 7){
+    MOcols <- names(MOSpalette)[seq_along(uomics)]
+  } else {
+    MOcols <- RColorBrewer::brewer.pal(length(uomics), "Set3")  
+  }
   names(MOcols) <- uomics
   MOcols
+}
+
+mapColor <- function(omic, MOcolors) {
+  color <- MOSpalette[MOcolors[omic]]
+  if (is.na(color))
+    color <- MOcolors[omic]
+  unname(color)
+}
+  
+createColors <- function(omics, MOcolors) {
+  sapply(unique(omics), function(o) mapColor(o, MOcolors))
 }
 
 matchAnnotations <- function(d1, d2){

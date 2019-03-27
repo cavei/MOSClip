@@ -3,7 +3,7 @@
 #' @importFrom survClip survivalcox survivalcox
 MOMSurvTest <- function(genes, omicsObj, annot,
                                   survFormula = "Surv(days, status) ~",
-                                  autoCompleteFormula=T, robust=FALSE) {
+                                  autoCompleteFormula=T, robust=FALSE, include_from_annot=F) {
   
   # check if topological method has been used
   for (i in seq_along(omicsObj@data)) {
@@ -34,9 +34,17 @@ MOMSurvTest <- function(genes, omicsObj, annot,
   if (!identical(row.names(coxObj), row.names(additionalCovariates)))
     stop("Mismatch in covariates and daysStatus annotations rownames.")
 
+  
   coxObj <- data.frame(coxObj, additionalCovariates)
+  
+  add_covs <- colnames(additionalCovariates)
+  if (include_from_annot) {
+    add_annot_covs <- colnames(coxObj)[!colnames(coxObj) %in% c("days", "status")]
+    add_covs <- c(add_covs, add_annot_covs)
+  }
+  
   if (autoCompleteFormula)
-    formula = paste0(survFormula, paste(colnames(additionalCovariates), collapse="+"))
+    formula = paste0(survFormula, paste(add_covs, collapse="+"))
 
   if (robust) {
     scox <- suppressWarnings(survClip::survivalcoxr(coxObj, formula)) ### Check warnings
